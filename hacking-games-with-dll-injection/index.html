@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="DLL injection is method of injecting code to some other processe’ss address space and executing that piece of code on behalf of that process. Note that we need administrator privileges to carry out su">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hacking games with DLL Injection">
+<meta property="og:url" content="http://ketansingh.net/hacking-games-with-dll-injection/index.html">
+<meta property="og:site_name" content="Ketansingh.net">
+<meta property="og:description" content="DLL injection is method of injecting code to some other processe’ss address space and executing that piece of code on behalf of that process. Note that we need administrator privileges to carry out su">
+<meta property="og:image" content="https://i.imgur.com/WLxIlxE.png">
+<meta property="og:image" content="https://i.imgur.com/o4r7BV3.png">
+<meta property="og:image" content="https://i.imgur.com/8CUSwlg.png">
+<meta property="og:image" content="https://i.imgur.com/ZRvzLRy.png">
+<meta property="og:image" content="https://i.imgur.com/skf6kXQ.png">
+<meta property="og:image" content="https://i.imgur.com/xLkLwNk.png">
+<meta property="og:image" content="https://i.imgur.com/xICzhR6.png">
+<meta property="og:updated_time" content="2016-06-04T03:43:24.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hacking games with DLL Injection">
+<meta name="twitter:description" content="DLL injection is method of injecting code to some other processe’ss address space and executing that piece of code on behalf of that process. Note that we need administrator privileges to carry out su">
+<meta name="twitter:image" content="https://i.imgur.com/WLxIlxE.png">
+<meta name="twitter:creator" content="@http://twitter.com/sh_ketan">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>Hacking games with DLL Injection</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+    <link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+    <!-- jquery -->
+    <script src="/lib/jquery/jquery.min.js"></script>
+</head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/spl0i7">Projects</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/sensor-status-twitter-bot-with-nodejs-and-raspberry-pi/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover='$("#i-prev").toggle();' onmouseout='$("#i-prev").toggle();'></i></a></li>
+        
+        
+        <li><a class="icon" href="/analyzing-script-kiddies-tool-torshammer/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover='$("#i-next").toggle();' onmouseout='$("#i-next").toggle();'></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover='$("#i-top").toggle();' onmouseout='$("#i-top").toggle();'></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover='$("#i-share").toggle();' onmouseout='$("#i-share").toggle();' onclick='$("#share").toggle();return false;'></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://ketansingh.net/hacking-games-with-dll-injection/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://ketansingh.net/hacking-games-with-dll-injection/&text=Hacking games with DLL Injection"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://ketansingh.net/hacking-games-with-dll-injection/&title=Hacking games with DLL Injection"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://ketansingh.net/hacking-games-with-dll-injection/&is_video=false&description=Hacking games with DLL Injection"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Hacking games with DLL Injection&body=Check out this article: http://ketansingh.net/hacking-games-with-dll-injection/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://ketansingh.net/hacking-games-with-dll-injection/&title=Hacking games with DLL Injection"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://ketansingh.net/hacking-games-with-dll-injection/&title=Hacking games with DLL Injection"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://ketansingh.net/hacking-games-with-dll-injection/&title=Hacking games with DLL Injection"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://ketansingh.net/hacking-games-with-dll-injection/&title=Hacking games with DLL Injection"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://ketansingh.net/hacking-games-with-dll-injection/&name=Hacking games with DLL Injection&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#How-Injection-works"><span class="toc-number">1.</span> <span class="toc-text">How Injection works?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Attach-to-target-process"><span class="toc-number">1.1.</span> <span class="toc-text">1) Attach to target process</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Allocate-memory-within-process-to-inject-code"><span class="toc-number">1.2.</span> <span class="toc-text">2) Allocate memory within process to inject code</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Copy-DLL-into-allocated-space"><span class="toc-number">1.3.</span> <span class="toc-text">3) Copy DLL into allocated space</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-Execute-the-code"><span class="toc-number">1.4.</span> <span class="toc-text">4) Execute the code</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Hacking-the-game"><span class="toc-number"></span> <span class="toc-text">Hacking the game</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Covering-the-bases"><span class="toc-number">1.</span> <span class="toc-text">Covering the bases</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Finding-out-available-functions"><span class="toc-number">2.</span> <span class="toc-text">Finding out available functions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Finding-location-of-Bomb"><span class="toc-number">3.</span> <span class="toc-text">Finding location of Bomb</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Coding-the-Bot"><span class="toc-number">4.</span> <span class="toc-text">Coding the Bot</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Testing-our-bot"><span class="toc-number">5.</span> <span class="toc-text">Testing our bot</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#What-next"><span class="toc-number"></span> <span class="toc-text">What next?</span></a>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Hacking games with DLL Injection
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Ketansingh.net</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2016-04-22T00:27:31.000Z" itemprop="datePublished">2016-04-22</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/C/">C</a>, <a class="tag-link" href="/tags/bot/">bot</a>, <a class="tag-link" href="/tags/reverse-engineering/">reverse engineering</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>DLL injection is method of injecting code to some other processe’ss address space and executing that piece of code on behalf of that process. Note that we need administrator privileges to carry out such an operation. DLL injection has gained bad name for itself since it’s mostly used by malware (remember meterpreter can also do this ? ) for stealth purposes but there is more to it than just stealth. To expand on this , I am going to quote this answer from <a href="https://reverseengineering.stackexchange.com/questions/2252/what-is-dll-injection-and-how-is-it-used-for-reversing" target="_blank" rel="external">Reverse Engineering Stack Exchange</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">DLL injection provides a platform for manipulating the execution of a running process. It&apos;s very commonly used for logging information while reverse engineering. For example, you can hook the IAT entry for a given imported operating system library function, and then log the function arguments onto disk. This provides you a data source that can assist in rapidly reverse engineering the target.</div><div class="line"></div><div class="line">DLL injection is not limited to logging, though. Given the fact that you have free reign to execute whatever code that you want within the process&apos; address space, you can modify the program in any way that you choose. This technique is frequently used within the game hacking world to code bots.</div><div class="line"></div><div class="line">Anything that you could do with byte patching, you can do with DLL injection. Except DLL injection will probably be easier and faster, because you get to code your patches in C instead of assembly language and do not have to labor over making manual modifications to the binary and its PE structure, finding code caves, etc. DLL injection almost entirely eliminates the need for using assembly language while making modifications to a binary; the only assembly language needed will be small pieces of code nearby the entrance and exit to a particular hook to save and restore the values of registers / the flags. It also makes binary modification fast and simple, and does not alter any cryptographic signatures of the executable that you are patching.</div><div class="line"></div><div class="line">DLL injection can be employed to solve highly non-trivial reverse engineering problems. The following example is necessarily vague in some respects because of non-disclosure agreements.</div></pre></td></tr></table></figure>
+<h2 id="How-Injection-works"><a href="#How-Injection-works" class="headerlink" title="How Injection works?"></a>How Injection works?</h2><p>DLL injection can be summarized in 4 setps</p>
+<h3 id="1-Attach-to-target-process"><a href="#1-Attach-to-target-process" class="headerlink" title="1) Attach to target process"></a>1) Attach to target process</h3><p>We use <code>OpenProcess()</code> with RWX (Read Write Execute) permissions to get handle to target process.</p>
+<h3 id="2-Allocate-memory-within-process-to-inject-code"><a href="#2-Allocate-memory-within-process-to-inject-code" class="headerlink" title="2) Allocate memory within process to inject code"></a>2) Allocate memory within process to inject code</h3><p>We use <code>VirtualAllocEx()</code> to allocate memory required to put our DLL. Think of this function like <code>malloc()</code></p>
+<h3 id="3-Copy-DLL-into-allocated-space"><a href="#3-Copy-DLL-into-allocated-space" class="headerlink" title="3) Copy DLL into allocated space"></a>3) Copy DLL into allocated space</h3><p>We use <code>WriteProcessMemory()</code> to write out DLL into allocated space.</p>
+<h3 id="4-Execute-the-code"><a href="#4-Execute-the-code" class="headerlink" title="4) Execute the code"></a>4) Execute the code</h3><p>This is the final process . Create a remote thread in the target process with <code>CreateRemoteThread()</code> using the address of the beginning of the DLL as the entry point to execute injected code.</p>
+<p>Writing step by step on all these step would make this article too lengthy So , I am going to link some excellent write-up on how to perform injection in detail.</p>
+<p><a href="http://blog.opensecurityresearch.com/2013/01/windows-dll-injection-basics.html" target="_blank" rel="external">Windows DLL Injection Basics</a></p>
+<p><a href="https://disman.tl/2015/01/30/an-improved-reflective-dll-injection-technique.html" target="_blank" rel="external">An Improved Reflective DLL Injection Technique</a></p>
+<h1 id="Hacking-the-game"><a href="#Hacking-the-game" class="headerlink" title="Hacking the game"></a>Hacking the game</h1><p>With all the newly gained knowledge , I am going to hack minesweeper by writing a simple bot to automatically play the game.</p>
+<h2 id="Covering-the-bases"><a href="#Covering-the-bases" class="headerlink" title="Covering the bases"></a>Covering the bases</h2><p>I am going to use <a href="http://www.cheatengine.org/" target="_blank" rel="external">Cheat Engine</a> to automate process of injecting DLL instead of manually writing a injector because I’m lazy. For compiling DLL , I am going to use Visual Studio to compile DLL . Some familiarity with Win32 API is assumed. Further IDA Pro is used to reverse engineer minesweeper binary.I am using XP’s minesweeper. Get it from my <a href="https://github.com/spl0i7/DllInject/blob/master/res/minesweeper.exe?raw=true" target="_blank" rel="external">Github</a> <a href="https://www.virustotal.com/en/file/bcff89311d792f6428468e813ac6929a346a979f907071c302f418d128eaaf41/analysis/1464898687/" target="_blank" rel="external">VirusTotal</a></p>
+<p>Let’s check if we can do ‘Hello world’ quickly.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;windows.h&gt;</span></span></div><div class="line"><span class="function">BOOL APIENTRY <span class="title">DllMain</span><span class="params">( HMODULE hModule,DWORD ul_reason_for_call, LPVOID lpReserved)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">switch</span> (ul_reason_for_call)</div><div class="line">    &#123;</div><div class="line">        <span class="keyword">case</span> DLL_PROCESS_ATTACH:</div><div class="line">        <span class="comment">/* The DLL is being loaded for the first time by a given process.</span></div><div class="line">        Perform per-process initialization here.  If the initialization</div><div class="line">        is successful, return TRUE; if unsuccessful, return FALSE. */</div><div class="line">			MessageBoxA(<span class="number">0</span> , <span class="string">"DLL has been attached !"</span> , <span class="string">"DLL Bot"</span> , MB_ICONEXCLAMATION | MB_OK);</div><div class="line"></div><div class="line">            <span class="keyword">break</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> TRUE;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Compile this code to DLL. It can easily be injected by Cheat Engine by </p>
+<p>1) Open the target program , minesweeper.exe in this case<br>2) Open the process in Cheat Engine then from <strong>Memory View &gt; Tools &gt; Inject DLL</strong>. Then supply the targer DLL and you should see something like</p>
+<p><img src="https://i.imgur.com/WLxIlxE.png" alt="Hello world"></p>
+<h2 id="Finding-out-available-functions"><a href="#Finding-out-available-functions" class="headerlink" title="Finding out available functions"></a>Finding out available functions</h2><p>We’re gonna use IDA Pro to find out what functions are available in the minesweeper binary for us to pivot to build the bot. Open the <strong>minesweeper.exe</strong> in IDA Pro and then click <strong>Functions</strong> to check list of functions </p>
+<p><img src="https://i.imgur.com/o4r7BV3.png" alt="functions"></p>
+<p>You can study what these functions do by setting up break points on these functions and then play the game to see when they are triggered. I studied one functions called <strong>StepSquare(x,x)</strong> located at address of <strong>0x1003512</strong> , It takes two parameter and jumps to square provided to it’s argument . This function will be used to step our bot throughout the it’s execution.</p>
+<h2 id="Finding-location-of-Bomb"><a href="#Finding-location-of-Bomb" class="headerlink" title="Finding location of Bomb"></a>Finding location of Bomb</h2><p>Now we that we know how to step forward in the game , we need to know where actual bombs are located to avoid stepping on it and complete the game.<br>Let’s start by fixing size of height and width to check where it is located in memory.</p>
+<p>In minesweeper choose some game size say 17x19 from <strong>Game &gt; Custom</strong> and then open the process in cheat engine.</p>
+<p>Search for <strong>17</strong> in game memory from cheat engine we can some address<br><img src="https://i.imgur.com/8CUSwlg.png" alt="search for 17"></p>
+<p>again chaining height to see <strong>11</strong> we can see how values change from <em>17</em> to <em>11</em> , now we are sure that height is located at address <strong>0x1005338</strong><br><img src="https://i.imgur.com/ZRvzLRy.png" alt="search for 11"><br>Similarly we can find out width and it was <strong>0x1005334</strong> in my case.</p>
+<p>Now let’s check out memory at address where width and height are located. After some observation and some trial &amp; error I noticed something near these memory address.<br>Notice the highlighted memory space.<br><img src="https://i.imgur.com/skf6kXQ.png" alt="memory 1"></p>
+<p>Memory location which store bomb or no bomb start at <strong>0x0015341</strong>. You can see how value change when I click first tile as<br><img src="https://i.imgur.com/xLkLwNk.png" alt="memory 2"></p>
+<p>These are the memory located which store if bomb is located a particular tile. <strong>0F</strong> means no bomb while <strong>8F</strong> means bomb.</p>
+<h2 id="Coding-the-Bot"><a href="#Coding-the-Bot" class="headerlink" title="Coding the Bot"></a>Coding the Bot</h2><p>Coding the bot is simple enough we just need to travel down the tile array and skip tile if it contains the bomb. For travelling we’re gonna use <strong>StepSquare(x,x)</strong>. You can read here in detail on how to <a href="http://www.codeproject.com/Articles/29527/Reverse-Engineering-and-Function-Calling-by-Addres" target="_blank" rel="external">call function by its address</a>. </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">unsigned</span> <span class="keyword">int</span> i, j;</div><div class="line">		<span class="keyword">for</span> (i = <span class="number">1</span>; i &lt;= *WIDTH; i++) &#123;</div><div class="line">			<span class="keyword">for</span> (j = <span class="number">1</span>; j &lt;= *HEIGHT; j++) &#123;</div><div class="line">				<span class="keyword">if</span> (isBomb(i, j))	CheckBox(i, j);</div><div class="line">			&#125;</div><div class="line">		&#125;</div></pre></td></tr></table></figure>
+<p>and <strong>isBomb()</strong> can be defined as</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">isBomb</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">int</span> i, <span class="keyword">unsigned</span> <span class="keyword">int</span> j)</span> </span>&#123;</div><div class="line">	<span class="keyword">unsigned</span> <span class="keyword">int</span> *tile = (<span class="keyword">unsigned</span> <span class="keyword">int</span> *)(<span class="number">0x1005340</span> + i + j);</div><div class="line">	<span class="keyword">if</span> ((BYTE)*tile == <span class="number">0x0F</span>)	<span class="keyword">return</span> <span class="number">1</span>;</div><div class="line">	<span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>You can see full source of the program here on <a href="https://github.com/spl0i7/DllInject" target="_blank" rel="external">Github</a></p>
+<h2 id="Testing-our-bot"><a href="#Testing-our-bot" class="headerlink" title="Testing our bot"></a>Testing our bot</h2><p>Testing is similar to the way we tested our ‘hello world’ DLL ,  on injcting this dll we get<br><img src="https://i.imgur.com/xICzhR6.png" alt="success"></p>
+<h1 id="What-next"><a href="#What-next" class="headerlink" title="What next?"></a>What next?</h1><p>You can try making a DLL injector yourself instead of relying on Cheat Engine for it. It’s not too hard and fairly easy to implement.<br>You can try to make hacks for other games , maybe Counter Strike 1.6? Global Offensive ? Only bottleneck with modern games is that they come with cheat protection , so it’s not easy like this to make cheats.</p>
+
+  </div>
+</article>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/spl0i7">Projects</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#How-Injection-works"><span class="toc-number">1.</span> <span class="toc-text">How Injection works?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Attach-to-target-process"><span class="toc-number">1.1.</span> <span class="toc-text">1) Attach to target process</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Allocate-memory-within-process-to-inject-code"><span class="toc-number">1.2.</span> <span class="toc-text">2) Allocate memory within process to inject code</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Copy-DLL-into-allocated-space"><span class="toc-number">1.3.</span> <span class="toc-text">3) Copy DLL into allocated space</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-Execute-the-code"><span class="toc-number">1.4.</span> <span class="toc-text">4) Execute the code</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Hacking-the-game"><span class="toc-number"></span> <span class="toc-text">Hacking the game</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Covering-the-bases"><span class="toc-number">1.</span> <span class="toc-text">Covering the bases</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Finding-out-available-functions"><span class="toc-number">2.</span> <span class="toc-text">Finding out available functions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Finding-location-of-Bomb"><span class="toc-number">3.</span> <span class="toc-text">Finding location of Bomb</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Coding-the-Bot"><span class="toc-number">4.</span> <span class="toc-text">Coding the Bot</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Testing-our-bot"><span class="toc-number">5.</span> <span class="toc-text">Testing our bot</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#What-next"><span class="toc-number"></span> <span class="toc-text">What next?</span></a>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://ketansingh.net/hacking-games-with-dll-injection/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://ketansingh.net/hacking-games-with-dll-injection/&text=Hacking games with DLL Injection"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://ketansingh.net/hacking-games-with-dll-injection/&title=Hacking games with DLL Injection"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://ketansingh.net/hacking-games-with-dll-injection/&is_video=false&description=Hacking games with DLL Injection"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Hacking games with DLL Injection&body=Check out this article: http://ketansingh.net/hacking-games-with-dll-injection/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://ketansingh.net/hacking-games-with-dll-injection/&title=Hacking games with DLL Injection"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://ketansingh.net/hacking-games-with-dll-injection/&title=Hacking games with DLL Injection"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://ketansingh.net/hacking-games-with-dll-injection/&title=Hacking games with DLL Injection"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://ketansingh.net/hacking-games-with-dll-injection/&title=Hacking games with DLL Injection"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://ketansingh.net/hacking-games-with-dll-injection/&name=Hacking games with DLL Injection&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick='$("#toc-footer").toggle();return false;'><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick='$("#share-footer").toggle();return false;'><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick='$("#nav-footer").toggle();return false;'><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2017 Ketan Singh
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/spl0i7">Projects</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    <script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-47868439-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>

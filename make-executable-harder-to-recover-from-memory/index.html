@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="Modern forensics tools are capable of recovering your executable from RAM even when you wiped it out from the hard-disk or other non volatile memory. As you may already know that when a program is run">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Make executable harder to recover from memory">
+<meta property="og:url" content="http://ketansingh.net/make-executable-harder-to-recover-from-memory/index.html">
+<meta property="og:site_name" content="Ketansingh.net">
+<meta property="og:description" content="Modern forensics tools are capable of recovering your executable from RAM even when you wiped it out from the hard-disk or other non volatile memory. As you may already know that when a program is run">
+<meta property="og:image" content="https://i.imgur.com/JK2uZuT.jpg">
+<meta property="og:image" content="https://i.imgur.com/U4YLYbU.png">
+<meta property="og:image" content="https://i.imgur.com/LH0oOZK.png">
+<meta property="og:image" content="https://i.imgur.com/E9qiXjW.png">
+<meta property="og:image" content="https://i.imgur.com/QJeNCun.png">
+<meta property="og:image" content="https://i.imgur.com/kWPlQlF.png">
+<meta property="og:updated_time" content="2016-12-11T02:58:24.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Make executable harder to recover from memory">
+<meta name="twitter:description" content="Modern forensics tools are capable of recovering your executable from RAM even when you wiped it out from the hard-disk or other non volatile memory. As you may already know that when a program is run">
+<meta name="twitter:image" content="https://i.imgur.com/JK2uZuT.jpg">
+<meta name="twitter:creator" content="@http://twitter.com/sh_ketan">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>Make executable harder to recover from memory</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+    <link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+    <!-- jquery -->
+    <script src="/lib/jquery/jquery.min.js"></script>
+</head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/spl0i7">Projects</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/setting-proxy-for-archlinux/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover='$("#i-next").toggle();' onmouseout='$("#i-next").toggle();'></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover='$("#i-top").toggle();' onmouseout='$("#i-top").toggle();'></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover='$("#i-share").toggle();' onmouseout='$("#i-share").toggle();' onclick='$("#share").toggle();return false;'></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://ketansingh.net/make-executable-harder-to-recover-from-memory/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://ketansingh.net/make-executable-harder-to-recover-from-memory/&text=Make executable harder to recover from memory"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://ketansingh.net/make-executable-harder-to-recover-from-memory/&title=Make executable harder to recover from memory"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://ketansingh.net/make-executable-harder-to-recover-from-memory/&is_video=false&description=Make executable harder to recover from memory"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Make executable harder to recover from memory&body=Check out this article: http://ketansingh.net/make-executable-harder-to-recover-from-memory/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://ketansingh.net/make-executable-harder-to-recover-from-memory/&title=Make executable harder to recover from memory"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://ketansingh.net/make-executable-harder-to-recover-from-memory/&title=Make executable harder to recover from memory"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://ketansingh.net/make-executable-harder-to-recover-from-memory/&title=Make executable harder to recover from memory"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://ketansingh.net/make-executable-harder-to-recover-from-memory/&title=Make executable harder to recover from memory"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://ketansingh.net/make-executable-harder-to-recover-from-memory/&name=Make executable harder to recover from memory&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#What-is-PE"><span class="toc-number">1.</span> <span class="toc-text">What is PE?</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Structure-of-PE"><span class="toc-number">1.1.</span> <span class="toc-text">Structure of PE</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Something-more-interesting-now"><span class="toc-number">1.2.</span> <span class="toc-text">Something more interesting now</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Make executable harder to recover from memory
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Ketansingh.net</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2016-12-11T00:04:29.000Z" itemprop="datePublished">2016-12-11</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/forensics/">forensics</a>, <a class="tag-link" href="/tags/malware/">malware</a>, <a class="tag-link" href="/tags/reverse-engineering/">reverse-engineering</a>, <a class="tag-link" href="/tags/windows/">windows</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>Modern forensics tools are capable of recovering your executable from RAM even when you wiped it out from the hard-disk or other non volatile memory. As you may already know that when a program is run, it gets loaded into memory by os’s loader. It’s a complex process of it’s own. After all the process specific initialization is done, program starts to execute and stays in memory until stopped. Many malware, to prevent sample acquisition wipe their image from the disk, thus making recovery a little harder if not impossible. Forensics investigators often try to circumvent this by imaging the RAM and then recovering the malware image from it but there are ways to prevent that. Let’s try to figure that out. But before that Let’s study a little bit about PE (Portable Executable)</p>
+<h1 id="What-is-PE"><a href="#What-is-PE" class="headerlink" title="What is PE?"></a>What is PE?</h1><p>Portable Executable (PE) is a file format used in Windows executable files. This file format is a specification for an executable file. Other popular executable file formats are <strong>ELF</strong> used in in Linux and <strong>Mach-o</strong> in OSX.</p>
+<p>The PE file format is a data structure that contains the information necessary for the Windows OS loader to manage the wrapped executable code. Before PE there was a format called <strong>COFF</strong> used in Windows NT systems.</p>
+<h2 id="Structure-of-PE"><a href="#Structure-of-PE" class="headerlink" title="Structure of PE"></a>Structure of PE</h2><p><img src="https://i.imgur.com/JK2uZuT.jpg" alt="header"></p>
+<p>First portion of PE is MS-DOS header. This is to ensure backwards compatibility, Microsoft has written a series of machine instructions into the head of each PE file. When a 32-bit Windows file is run in a 16-bit DOS environment, the program will display the error message: “This program cannot be run in DOS mode.”, then terminate. It can be described as<br><figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">struct</span> DOS_Header &#123;  </div><div class="line">     <span class="keyword">char</span> signature[<span class="number">2</span>] = <span class="string">"MZ"</span>; <span class="comment">//Magic Number</span></div><div class="line">     <span class="keyword">short</span> lastsize;</div><div class="line">     <span class="keyword">short</span> nblocks;</div><div class="line">     <span class="keyword">short</span> nreloc;</div><div class="line">     <span class="keyword">short</span> hdrsize;</div><div class="line">     <span class="keyword">short</span> minalloc;</div><div class="line">     <span class="keyword">short</span> maxalloc;</div><div class="line">     <span class="keyword">void</span> *ss;</div><div class="line">     <span class="keyword">void</span> *sp;</div><div class="line">     <span class="keyword">short</span> checksum;</div><div class="line">     <span class="keyword">void</span> *ip;</div><div class="line">     <span class="keyword">void</span> *cs;</div><div class="line">     <span class="keyword">short</span> relocpos;</div><div class="line">     <span class="keyword">short</span> noverlay;</div><div class="line">     <span class="keyword">short</span> reserved1[<span class="number">4</span>];</div><div class="line">     <span class="keyword">short</span> oem_id;</div><div class="line">     <span class="keyword">short</span> oem_info;</div><div class="line">     <span class="keyword">short</span> reserved2[<span class="number">10</span>];</div><div class="line">     <span class="keyword">long</span>  e_lfanew; <span class="comment">//Address to NT header</span></div></pre></td></tr></table></figure></p>
+<p>It’s a complicated structure so, I commented out stuff relevant for this discussion. </p>
+<p>After the DOS header there is a stub program that as discussed above.</p>
+<p><em>e_magic</em> is ASCII set to “MZ” which stands for Mark Zibikowski who developed MS-DOS. We care only about <em>e_lfanew</em> which is a pointer to PE header. Let’s take a brief look at NT Header.</p>
+<p>NT Header can be described with following structure </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">struct</span> _IMAGE_NT_HEADERS &#123;</div><div class="line">  DWORD                 Signature;</div><div class="line">  IMAGE_FILE_HEADER     FileHeader;</div><div class="line">  IMAGE_OPTIONAL_HEADER OptionalHeader;</div><div class="line">&#125; IMAGE_NT_HEADERS, *PIMAGE_NT_HEADERS;</div></pre></td></tr></table></figure>
+<p>We have Signature which contains some well known value to identify the structure. FileHeader and Optional Header is embedded in structure and are not a pointer.</p>
+<p>Let’s take a little bit look at <em>IMAGE_FILE_HEADER</em></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> _IMAGE_FILE_HEADER &#123;</div><div class="line">  WORD  Machine;</div><div class="line">  WORD  NumberOfSections;</div><div class="line">  DWORD TimeDateStamp;</div><div class="line">  DWORD PointerToSymbolTable;</div><div class="line">  DWORD NumberOfSymbols;</div><div class="line">  WORD  SizeOfOptionalHeader;</div><div class="line">  WORD  Characteristics;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>Machine</strong>  refers to type of architecture (x86-64 or x86).</p>
+<p><strong>TimeDateStamp</strong> is the unix timestamp when the file was linked.</p>
+<p>and so on.</p>
+<p>You can read about other field <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms680313(v=vs.85" target="_blank" rel="external">here.</a>.aspx)</p>
+<p>Interesting member is SizeOfOptionalHeader which contains a field called SizeOfHeaders  which refers to t he combined size of the following items,</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">e_lfanew member of IMAGE_DOS_HEADER</div><div class="line">4 byte signature</div><div class="line">size of IMAGE_FILE_HEADER</div><div class="line">size of optional header</div><div class="line">size of all section headers</div></pre></td></tr></table></figure>
+<h2 id="Something-more-interesting-now"><a href="#Something-more-interesting-now" class="headerlink" title="Something more interesting now"></a>Something more interesting now</h2><p>Now what can we do from above information to hide our malware? Answer is to erase the header from memory and recovery of executable will become almost impossible. Let’s try it out.</p>
+<p>This is the simple code whose executable we’ll try to recover</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">while</span>(<span class="literal">true</span>) &#123;</div><div class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"Hello this is dog"</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</div><div class="line">        Sleep(<span class="number">2000</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>I will be using rekall tools, you can grab it from <a href="https://github.com/google/rekall/releases" target="_blank" rel="external">here</a>. First step is to compile and run the above program. Then run winpmem (download from rekall link) and run this command as administrator from cmd prompt.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">winpmem.exe -o dump</div></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/U4YLYbU.png" alt="first"></p>
+<p>Now we should start rekall with this dumped image, we can do this by</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">rekall.exe -f &lt;path-to-dump&gt;</div></pre></td></tr></table></figure>
+<p>now to dump executable image</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">procdump prog_regex=&quot;badboy*&quot;, dump_dir=&lt;path-to-dump-executable&gt;</div></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/LH0oOZK.png" alt="second"></p>
+<p>Opening it in IDA, looks like regular binary, with everything intact , it even works on double clicking it. </p>
+<p><img src="https://i.imgur.com/E9qiXjW.png" alt="third"></p>
+<p>Now Let’s try by erasing the header and see what happens. </p>
+<pre><code class="C"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"stdafx.h"</span></span>
+
+<span class="function"><span class="keyword">void</span> <span class="title">badboy</span><span class="params">()</span> </span>{
+    <span class="keyword">while</span>(<span class="literal">true</span>) {
+        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"Hello this is dog"</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;
+        Sleep(<span class="number">2000</span>);
+    }
+}
+
+<span class="keyword">int</span> _tmain(<span class="keyword">int</span> argc, _TCHAR* argv[])
+{
+    BOOL pFailure = FALSE;
+    DWORD sizeOfHeader = <span class="number">0</span>;
+    DWORD lpOldProtect = <span class="number">0</span>;
+    HANDLE imgAddress = GetModuleHandle(<span class="literal">NULL</span>);
+    PIMAGE_DOS_HEADER pDosHeader = (PIMAGE_DOS_HEADER)imgAddress;
+    PIMAGE_NT_HEADERS pNtHeader = (PIMAGE_NT_HEADERS)((DWORD)pDosHeader + (DWORD)pDosHeader-&gt;e_lfanew);
+
+    <span class="built_in">printf</span>(<span class="string">"NT Header at : %p\n"</span>, pNtHeader);
+    <span class="built_in">printf</span>(<span class="string">"DOS Header at : %p\n"</span>, pDosHeader);
+    <span class="built_in">printf</span>(<span class="string">"Offset : %p\n"</span>, (DWORD)pNtHeader - (DWORD)pDosHeader);
+
+    <span class="keyword">if</span>(pDosHeader-&gt;e_magic != IMAGE_DOS_SIGNATURE) {
+        <span class="built_in">puts</span>(<span class="string">"We got some problems, DOS Signature mismatch\n"</span>);
+        pFailure = TRUE;
+    }
+    <span class="keyword">if</span>(pNtHeader-&gt;Signature != IMAGE_NT_SIGNATURE){
+        <span class="built_in">puts</span>(<span class="string">"We got some problems, NT Signature mismatch\n"</span>);
+        pFailure = TRUE;
+    }
+
+    sizeOfHeader = pNtHeader-&gt;OptionalHeader.SizeOfCode;
+
+    <span class="built_in">printf</span>(<span class="string">"Header Size : %d\n"</span>, sizeOfHeader);
+
+    <span class="keyword">if</span>(!pFailure) {
+        BOOL pChangePerm = VirtualProtect((LPVOID)imgAddress, sizeOfHeader,PAGE_READWRITE,&amp;lpOldProtect);
+        <span class="keyword">if</span>(pChangePerm) {
+            <span class="built_in">puts</span>(<span class="string">"Modified page permission to RW\n"</span>);
+            RtlZeroMemory((PVOID)imgAddress,sizeOfHeader);
+        }
+        pChangePerm = VirtualProtect((LPVOID)imgAddress,sizeOfHeader,lpOldProtect,&amp;lpOldProtect);
+
+        <span class="keyword">if</span>(pChangePerm){
+            <span class="built_in">puts</span>(<span class="string">"Page Permission restored\n"</span>);
+        }
+    }
+
+    badboy();
+
+    <span class="keyword">return</span> <span class="number">0</span>;
+}
+</code></pre>
+<p>Note that we also need to make page writable using VirtualProtect() and then nulled out memory using RtlZeroMemory() which works like memset()</p>
+<p>This is the all the theory put into code. Now let’s try to run this process</p>
+<p><img src="https://i.imgur.com/QJeNCun.png" alt="fourth"></p>
+<p>Let’s acquire the image and try to extract the executable using command save as above. Dumping out the process and viewing it in IDA</p>
+<p><img src="https://i.imgur.com/kWPlQlF.png" alt="fifth"></p>
+<p>And BAM!! IDA Can’t read anything from it. Neither can any other debugger since we corrupted header which contains all the meta data about a program. </p>
+<p>All the credit goes to int0x80 for showing this technique.</p>
+<p>References </p>
+<p><a href="https://media.defcon.org/DEF%20CON%2024/DEF%20CON%2024%20presentations/DEFCON-24-Int0X80-Anti-Forensics-AF.pdf" target="_blank" rel="external">Anti-Forensics AF (PDF)</a></p>
+<p><a href="https://www.youtube.com/watch?v=_fZfDGWpP4U" target="_blank" rel="external">DEF CON 24 - int0x80 - Anti Forensics AF (Video) </a></p>
+<p><a href="https://en.wikibooks.org/wiki/X86_Disassembly/Windows_Executable_Files" target="_blank" rel="external">x86 Disassembly/Windows Executable Files
+</a></p>
+<p><a href="https://msdn.microsoft.com/en-us/library/ms809762.aspx" target="_blank" rel="external">Peering Inside the PE: A Tour of the Win32 Portable Executable File Format</a></p>
+<p><a href="https://www.youtube.com/playlist?list=PLUFkSN0XLZ-n_Na6jwqopTt1Ki57vMIc3" target="_blank" rel="external">Life of Binaries 2013</a></p>
+
+  </div>
+</article>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/spl0i7">Projects</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#What-is-PE"><span class="toc-number">1.</span> <span class="toc-text">What is PE?</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Structure-of-PE"><span class="toc-number">1.1.</span> <span class="toc-text">Structure of PE</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Something-more-interesting-now"><span class="toc-number">1.2.</span> <span class="toc-text">Something more interesting now</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://ketansingh.net/make-executable-harder-to-recover-from-memory/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://ketansingh.net/make-executable-harder-to-recover-from-memory/&text=Make executable harder to recover from memory"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://ketansingh.net/make-executable-harder-to-recover-from-memory/&title=Make executable harder to recover from memory"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://ketansingh.net/make-executable-harder-to-recover-from-memory/&is_video=false&description=Make executable harder to recover from memory"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Make executable harder to recover from memory&body=Check out this article: http://ketansingh.net/make-executable-harder-to-recover-from-memory/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://ketansingh.net/make-executable-harder-to-recover-from-memory/&title=Make executable harder to recover from memory"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://ketansingh.net/make-executable-harder-to-recover-from-memory/&title=Make executable harder to recover from memory"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://ketansingh.net/make-executable-harder-to-recover-from-memory/&title=Make executable harder to recover from memory"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://ketansingh.net/make-executable-harder-to-recover-from-memory/&title=Make executable harder to recover from memory"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://ketansingh.net/make-executable-harder-to-recover-from-memory/&name=Make executable harder to recover from memory&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick='$("#toc-footer").toggle();return false;'><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick='$("#share-footer").toggle();return false;'><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick='$("#nav-footer").toggle();return false;'><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2017 Ketan Singh
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/spl0i7">Projects</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    <script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-47868439-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>

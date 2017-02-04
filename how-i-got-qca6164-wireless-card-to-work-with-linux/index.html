@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="After months of bashing my head around , I finally found a way to make to make Qualcomm Atheros QCA61x4 or QCA6164 to work with linux (I Tested it on ubuntu 15.4 with 3.19.0-15 kernel )
+What’s the pro">
+<meta property="og:type" content="article">
+<meta property="og:title" content="How I got QCA6164 Wireless card to work with linux">
+<meta property="og:url" content="http://ketansingh.net/how-i-got-qca6164-wireless-card-to-work-with-linux/index.html">
+<meta property="og:site_name" content="Ketansingh.net">
+<meta property="og:description" content="After months of bashing my head around , I finally found a way to make to make Qualcomm Atheros QCA61x4 or QCA6164 to work with linux (I Tested it on ubuntu 15.4 with 3.19.0-15 kernel )
+What’s the pro">
+<meta property="og:updated_time" content="2016-06-04T03:51:14.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="How I got QCA6164 Wireless card to work with linux">
+<meta name="twitter:description" content="After months of bashing my head around , I finally found a way to make to make Qualcomm Atheros QCA61x4 or QCA6164 to work with linux (I Tested it on ubuntu 15.4 with 3.19.0-15 kernel )
+What’s the pro">
+<meta name="twitter:creator" content="@http://twitter.com/sh_ketan">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>How I got QCA6164 Wireless card to work with linux</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+    <link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+    <!-- jquery -->
+    <script src="/lib/jquery/jquery.min.js"></script>
+</head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/spl0i7">Projects</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/getting-free-ssl-with-letsencrypt-org/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover='$("#i-prev").toggle();' onmouseout='$("#i-prev").toggle();'></i></a></li>
+        
+        
+        <li><a class="icon" href="/firewall-bypass-over-icmp-covert-channel/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover='$("#i-next").toggle();' onmouseout='$("#i-next").toggle();'></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover='$("#i-top").toggle();' onmouseout='$("#i-top").toggle();'></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover='$("#i-share").toggle();' onmouseout='$("#i-share").toggle();' onclick='$("#share").toggle();return false;'></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://ketansingh.net/how-i-got-qca6164-wireless-card-to-work-with-linux/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://ketansingh.net/how-i-got-qca6164-wireless-card-to-work-with-linux/&text=How I got QCA6164 Wireless card to work with linux"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://ketansingh.net/how-i-got-qca6164-wireless-card-to-work-with-linux/&title=How I got QCA6164 Wireless card to work with linux"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://ketansingh.net/how-i-got-qca6164-wireless-card-to-work-with-linux/&is_video=false&description=How I got QCA6164 Wireless card to work with linux"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=How I got QCA6164 Wireless card to work with linux&body=Check out this article: http://ketansingh.net/how-i-got-qca6164-wireless-card-to-work-with-linux/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://ketansingh.net/how-i-got-qca6164-wireless-card-to-work-with-linux/&title=How I got QCA6164 Wireless card to work with linux"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://ketansingh.net/how-i-got-qca6164-wireless-card-to-work-with-linux/&title=How I got QCA6164 Wireless card to work with linux"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://ketansingh.net/how-i-got-qca6164-wireless-card-to-work-with-linux/&title=How I got QCA6164 Wireless card to work with linux"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://ketansingh.net/how-i-got-qca6164-wireless-card-to-work-with-linux/&title=How I got QCA6164 Wireless card to work with linux"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://ketansingh.net/how-i-got-qca6164-wireless-card-to-work-with-linux/&name=How I got QCA6164 Wireless card to work with linux&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#What’s-the-problem"><span class="toc-number">1.</span> <span class="toc-text">What’s the problem ?</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#What’s-the-solution"><span class="toc-number">2.</span> <span class="toc-text">What’s the solution ?</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#What-works"><span class="toc-number">3.</span> <span class="toc-text">What works?</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        How I got QCA6164 Wireless card to work with linux
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Ketansingh.net</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2015-10-20T08:40:45.000Z" itemprop="datePublished">2015-10-20</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/networking/">networking</a>, <a class="tag-link" href="/tags/wifi/">wifi</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>After months of bashing my head around , I finally found a way to make to make Qualcomm Atheros QCA61x4 or QCA6164 to work with linux (I Tested it on ubuntu 15.4 with 3.19.0-15 kernel )</p>
+<h1 id="What’s-the-problem"><a href="#What’s-the-problem" class="headerlink" title="What’s the problem ?"></a>What’s the problem ?</h1><p>By default (at the time of writing this post) wifi on laptops with Atheros wifi 168c:0041(QCA6164) doesn’t works. Why? Because there is no firmware and driver for this particular chip by default.This affects several lenovo laptops.</p>
+<h1 id="What’s-the-solution"><a href="#What’s-the-solution" class="headerlink" title="What’s the solution ?"></a>What’s the solution ?</h1><p>Solution is rather simple but for some reasons it took me a while to finally get my wifi working. I tried it initially on a different kernel and on a different different distro.</p>
+<p>Get the latest backport<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">~$ wget https://www.kernel.org/pub/linux/kernel/projects/backports/2015/09/03/backports-20150903.tar.gz</div></pre></td></tr></table></figure></p>
+<p>Uncompress it<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">~$ tar -xf backports-20150903.tar.gz</div></pre></td></tr></table></figure></p>
+<p>then do<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">~$ <span class="built_in">cd</span> backports-20150903</div><div class="line">~$ make defconfig-ath10k</div><div class="line">~$ make</div></pre></td></tr></table></figure></p>
+<p>and finally seal the deal<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">~$ sudo make install</div></pre></td></tr></table></figure></p>
+<p>if you get any errors then make you have kernel headers and build-essential package installed</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">~$ sudo apt-get install build-essential linux-headers-$(uname -r)</div></pre></td></tr></table></figure>
+<p>now that we have backports installed we just need firmware </p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">~$ git <span class="built_in">clone</span> https://github.com/atondwal/ath10k-firmware.git</div><div class="line">~$ sudo cp -r ath10k-firmware/ath10k/ /lib/firmware/</div><div class="line">~$ <span class="built_in">cd</span> /lib/firmware/ath10k/QCA6164</div><div class="line">~$ sudo cp -r hw2.1/ /lib/firmware/ath10k/QCA6174/</div></pre></td></tr></table></figure>
+<p>and finally<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">~$ sudo <span class="built_in">echo</span> <span class="string">"options ath10k_core skip_otp=y"</span> &gt; /etc/modprobe.d/ath10k_core.conf</div></pre></td></tr></table></figure></p>
+<p>Reboot and see the magic ;)<br>if it still does’t works then try<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">~$ sudo modprobe ath10k_pci</div></pre></td></tr></table></figure></p>
+<p>Note that you’ll need to reinstall backports if you upgrade or change the kernel.<br>There’s also another method that is , install dkms from backports but it did not work for me. :/ , with DKMS you’ll no longer need to reinstall backports everytime you upgrade kernel.</p>
+<h1 id="What-works"><a href="#What-works" class="headerlink" title="What works?"></a>What works?</h1><p>As far as I know , everything works fine and also airodump also works pretty much :] . Altough , I did not test aircrack.</p>
+
+  </div>
+</article>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/spl0i7">Projects</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#What’s-the-problem"><span class="toc-number">1.</span> <span class="toc-text">What’s the problem ?</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#What’s-the-solution"><span class="toc-number">2.</span> <span class="toc-text">What’s the solution ?</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#What-works"><span class="toc-number">3.</span> <span class="toc-text">What works?</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://ketansingh.net/how-i-got-qca6164-wireless-card-to-work-with-linux/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://ketansingh.net/how-i-got-qca6164-wireless-card-to-work-with-linux/&text=How I got QCA6164 Wireless card to work with linux"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://ketansingh.net/how-i-got-qca6164-wireless-card-to-work-with-linux/&title=How I got QCA6164 Wireless card to work with linux"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://ketansingh.net/how-i-got-qca6164-wireless-card-to-work-with-linux/&is_video=false&description=How I got QCA6164 Wireless card to work with linux"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=How I got QCA6164 Wireless card to work with linux&body=Check out this article: http://ketansingh.net/how-i-got-qca6164-wireless-card-to-work-with-linux/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://ketansingh.net/how-i-got-qca6164-wireless-card-to-work-with-linux/&title=How I got QCA6164 Wireless card to work with linux"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://ketansingh.net/how-i-got-qca6164-wireless-card-to-work-with-linux/&title=How I got QCA6164 Wireless card to work with linux"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://ketansingh.net/how-i-got-qca6164-wireless-card-to-work-with-linux/&title=How I got QCA6164 Wireless card to work with linux"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://ketansingh.net/how-i-got-qca6164-wireless-card-to-work-with-linux/&title=How I got QCA6164 Wireless card to work with linux"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://ketansingh.net/how-i-got-qca6164-wireless-card-to-work-with-linux/&name=How I got QCA6164 Wireless card to work with linux&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick='$("#toc-footer").toggle();return false;'><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick='$("#share-footer").toggle();return false;'><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick='$("#nav-footer").toggle();return false;'><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2017 Ketan Singh
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/spl0i7">Projects</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    <script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-47868439-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>

